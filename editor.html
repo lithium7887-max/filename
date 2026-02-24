@@ -8,81 +8,144 @@
     <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
     
     <style>
-        body { font-family: sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; }
-        .toolbar { margin-bottom: 10px; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: inline-block; }
-        .button-group { margin-bottom: 10px; }
-        .control-group { background: #f9f9f9; padding: 10px; border-radius: 5px; display: inline-block; border: 1px solid #ddd; margin: 0 5px; }
-        button, input[type="file"], select { padding: 8px 15px; margin: 0 3px; cursor: pointer; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; background-color: #fff; transition: 0.2s; vertical-align: middle; }
-        button:hover { background-color: #e9e9e9; }
-        #btnSave { background-color: #4CAF50; color: white; border-color: #4CAF50; font-weight: bold; }
-        #btnSave:hover { background-color: #45a049; }
-        #btnSticker { background-color: #fff3e0; border-color: #ffcc80; font-weight: bold; }
-        #btnSticker:hover { background-color: #ffe0b2; }
-        input[type="color"], input[type="range"] { vertical-align: middle; cursor: pointer; }
+        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; color: #333; }
+        h2 { margin-bottom: 25px; }
+
+        /* [핵심 수정] UI 요소들의 너비를 통일하고 중앙 정렬하기 위한 컨테이너 */
+        .ui-wrapper {
+            display: block;
+            width: 95%;           /* 모바일 등 작은 화면에서는 꽉 차게 */
+            max-width: 1050px;    /* 너무 넓어지지 않게 최대 너비 제한 (툴바 버튼들이 딱 들어갈 정도) */
+            margin: 0 auto 15px;  /* 중앙 정렬 및 아래쪽 여백 */
+        }
+
+        /* 툴바 스타일 (inline-block 제거하고 너비 100%로 설정) */
+        .toolbar { 
+            padding: 20px; 
+            background: white; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
+            width: 100%; 
+            box-sizing: border-box; /* padding이 너비에 포함되도록 설정 */
+        }
         
-        .canvas-container-wrapper { width: 100%; max-width: 100%; overflow: auto; margin-top: 20px; display: flex; justify-content: center; }
-        .canvas-container { box-shadow: 0 5px 15px rgba(0,0,0,0.2); background-color: white; }
+        .button-group { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .control-group { background: #f8f9fa; padding: 8px 15px; border-radius: 6px; display: inline-block; border: 1px solid #e9ecef; margin: 5px; vertical-align: middle; }
         
-        .help-text { background: #e8f0fe; color: #1a73e8; padding: 15px; border-radius: 8px; font-size: 15px; margin-bottom: 20px; display: inline-block; text-align: left; line-height: 1.6; border: 1px solid #c2e0ff; }
-        .help-text b { color: #d93025; }
+        /* 버튼 및 입력창 스타일 다듬기 */
+        button, input[type="file"], select { 
+            padding: 10px 18px; 
+            margin: 4px; 
+            cursor: pointer; 
+            font-size: 14px; 
+            border: 1px solid #ddd; 
+            border-radius: 6px; 
+            background-color: #fff; 
+            transition: all 0.2s; 
+            vertical-align: middle; 
+            font-weight: 500;
+            color: #555;
+        }
+        button:hover, select:hover { background-color: #f1f3f5; border-color: #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        /* 주요 버튼 색상 포인트 */
+        #btnSave { background-color: #28a745; color: white; border: none; }
+        #btnSave:hover { background-color: #218838; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); }
+        #btnSticker { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        #btnSticker:hover { background-color: #ffe8a1; }
+        #btnDelete { color: #dc3545; border-color: #dc3545; }
+        #btnDelete:hover { background-color: #dc3545; color: white; }
+
+        input[type="color"] { padding: 2px 4px; height: 34px; }
+        input[type="range"] { vertical-align: middle; cursor: pointer; }
+        
+        /* 캔버스 영역 스타일 */
+        .canvas-container-wrapper { width: 100%; max-width: 100%; overflow: auto; margin-top: 25px; display: flex; justify-content: center; padding-bottom: 20px; }
+        .canvas-container { box-shadow: 0 8px 30px rgba(0,0,0,0.15); background-color: white; border-radius: 4px; }
+        
+        /* [핵심 수정] 설명창 스타일 (inline-block 제거, 너비 100% 설정) */
+        .help-text { 
+            background: #e7f5ff; 
+            color: #004085; 
+            padding: 15px 20px; 
+            border-radius: 10px; 
+            font-size: 14px; 
+            text-align: left; 
+            line-height: 1.7; 
+            border: 1px solid #b8daff; 
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+        }
+        .help-icon { font-size: 20px; margin-right: 15px; color: #007bff; }
+        .help-content b { color: #0056b3; background-color: rgba(0,123,255,0.1); padding: 2px 4px; border-radius: 3px; }
     </style>
 </head>
 <body>
 
     <h2>나만의 고화질 웹 사진 편집 툴 🎨</h2>
     
-    <div class="help-text">
-        🔍 <b>마우스 휠</b>: 확대/축소 &nbsp;&nbsp;|&nbsp;&nbsp; 🖐️ <b>Alt + 드래그</b>: 화면 이동 &nbsp;&nbsp;|&nbsp;&nbsp; 🗑️ <b>Backspace / Delete</b>: 객체 삭제
+    <div class="ui-wrapper">
+        <div class="help-text">
+            <div class="help-icon">💡</div>
+            <div class="help-content">
+                <b>마우스 휠</b>: 이미지 확대/축소 (Zoom) &nbsp;|&nbsp; 
+                <b>Alt 키 + 드래그</b>: 화면 이동 (Pan) &nbsp;|&nbsp; 
+                <b>Backspace / Delete 키</b>: 선택 객체 삭제
+            </div>
+        </div>
     </div>
 
-    <div class="toolbar">
-        <div class="button-group">
-            <input type="file" id="imageLoader" accept="image/*" title="배경으로 쓸 원본 사진 선택" />
-            <button id="btnRect">🟥 빈 사각형</button>
-            <button id="btnHollowCircle">⭕ 빈 원</button>
-            <button id="btnCircle">🔵 꽉 찬 원</button>
-            <button id="btnArrow">↗️ 화살표</button>
-            <button id="btnText">📝 텍스트</button>
-            <button id="btnDelete">🗑️ 선택 삭제</button>
-            <button id="btnSave">💾 고화질 저장</button>
-        </div>
-        
-        <div>
-            <div class="control-group">
-                <label>🎨 색상: <input type="color" id="colorPicker" value="#FF0000"></label>
-                <span style="margin: 0 10px; color:#ccc;">|</span>
-                <label>📏 선 두께: <input type="range" id="lineWidth" min="1" max="50" value="10"></label>
+    <div class="ui-wrapper">
+        <div class="toolbar">
+            <div class="button-group">
+                <input type="file" id="imageLoader" accept="image/*" title="배경으로 쓸 원본 사진 선택" />
+                <button id="btnRect">🟥 빈 사각형</button>
+                <button id="btnHollowCircle">⭕ 빈 원</button>
+                <button id="btnCircle">🔵 꽉 찬 원</button>
+                <button id="btnArrow">↗️ 화살표</button>
+                <button id="btnText">📝 텍스트</button>
+                <button id="btnDelete">🗑️ 선택 삭제</button>
+                <button id="btnSave">💾 고화질 저장</button>
             </div>
             
-            <div class="control-group" style="background: #fff3e0; border-color: #ffcc80;">
-                <label>😀 이모지: 
-                    <select id="emojiSelect">
-                        <option value="⭐">⭐ 별</option>
-                        <option value="❤️">❤️ 하트</option>
-                        <option value="👍">👍 따봉</option>
-                        <option value="✅">✅ 체크</option>
-                        <option value="⭕">⭕ 빈 동그라미(O)</option>
-                        <option value="❌">❌ 엑스표</option>
-                        <option value="❓">❓ 물음표</option>
-                        <option value="❗">❗ 느낌표</option>
-                        <option value="💯">💯 굿 (100점)</option>
-                        <option value="👎">👎 배드 (우우~)</option>
-                        <option value="🆗">🆗 오케이 (마크)</option>
-                        <option value="😊">😊 스마일</option>
-                        <option value="🔥">🔥 불꽃</option>
-                        <option value="✨">✨ 반짝이</option>
-                        <option value="웃">웃 (졸라맨)</option>
-                        <option value="옷">옷 (만세맨)</option>
-                        <option value="🏃">🏃 달리는 사람</option>
-                        <option value="🕺">🕺 춤추는 사람</option>
-                        <option value="🤺">🤺 펜싱 (싸우는 사람)</option>
-                        <option value="👍 GOOD!">👍 GOOD! (글자)</option>
-                        <option value="👎 BAD...">👎 BAD... (글자)</option>                    </select>
-                </label>
-                <button id="btnEmoji">➕ 넣기</button>
-                <span style="margin: 0 10px; color:#ff9800;">|</span>
-                <input type="file" id="stickerLoader" accept="image/*" style="display: none;" />
-                <button id="btnSticker">🌟 내 스티커 추가</button>
+            <div>
+                <div class="control-group">
+                    <label>🎨 색상: <input type="color" id="colorPicker" value="#FF0000"></label>
+                    <span style="margin: 0 10px; color:#ccc;">|</span>
+                    <label>📏 선 두께: <input type="range" id="lineWidth" min="1" max="50" value="10" title="선 두께 조절"></label>
+                </div>
+                
+                <div class="control-group" style="background: #fff9e6; border-color: #ffecb5;">
+                    <label>😀 이모지: 
+                        <select id="emojiSelect">
+                            <option value="⭐">⭐ 별</option>
+                            <option value="❤️">❤️ 하트</option>
+                            <option value="👍">👍 굿 (따봉)</option>
+                            <option value="💯">💯 굿 (100점)</option>
+                            <option value="💮">💮 굿 (참잘했어요)</option>
+                            <option value="👌">👌 오케이 (손모양)</option>
+                            <option value="🙆">🙆 오케이 (사람)</option>
+                            <option value="🆗">🆗 오케이 (마크)</option>
+                            <option value="👎">👎 배드 (우우~)</option>
+                            <option value="✅">✅ 체크 (정상)</option>
+                            <option value="❌">❌ 엑스표 (불량)</option>
+                            <option value="⭕">⭕ 빈 동그라미 (O)</option>
+                            <option value="👍 GOOD!">👍 GOOD! (글자)</option>
+                            <option value="👎 BAD...">👎 BAD... (글자)</option>
+                            <option value="웃">웃 (졸라맨)</option>
+                            <option value="옷">옷 (만세맨)</option>
+                            <option value="🏃">🏃 달리는 사람</option>
+                            <option value="❓">❓ 물음표</option>
+                            <option value="❗">❗ 느낌표</option>
+                        </select>
+                    </label>
+                    <button id="btnEmoji">➕ 넣기</button>
+                    <span style="margin: 0 10px; color:#ffc107;">|</span>
+                    <input type="file" id="stickerLoader" accept="image/*" style="display: none;" />
+                    <button id="btnSticker">🌟 내 스티커 추가</button>
+                </div>
             </div>
         </div>
     </div>
@@ -97,6 +160,11 @@
             fabric.IText.prototype.textBaseline = 'bottom';
             fabric.Object.prototype.cornerSize = 20;
             fabric.Object.prototype.transparentCorners = false;
+            // 회전 조절점(MTR)을 좀 더 위로 올려서 선택하기 쉽게 함
+            fabric.Object.prototype.rotatingPointOffset = 40;
+            // 객체 선택 시 테두리 색상 변경
+            fabric.Object.prototype.borderColor = '#007bff';
+            fabric.Object.prototype.cornerColor = '#007bff';
         }
 
         window.onload = function() {
@@ -142,6 +210,7 @@
                     this.selection = false;
                     this.lastPosX = opt.e.clientX;
                     this.lastPosY = opt.e.clientY;
+                    canvas.defaultCursor = 'grabbing'; // 드래그 중 커서 변경
                 }
             });
 
@@ -157,35 +226,21 @@
             });
 
             canvas.on('mouse:up', function(opt) {
-                this.isDragging = false;
-                this.selection = true;
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.selection = true;
+                    canvas.defaultCursor = 'default'; // 커서 복구
+                }
             });
 
             // 3. 도형 및 텍스트 추가
-            
-            // [수정] 빈 사각형: strokeUniform: true 추가
             document.getElementById('btnRect').addEventListener('click', function() {
-                const rect = new fabric.Rect({ 
-                    left: 100, top: 100, width: 300, height: 200, 
-                    fill: 'transparent', 
-                    stroke: colorPicker.value, 
-                    strokeWidth: parseInt(lineWidthSlider.value), 
-                    transparentCorners: false,
-                    strokeUniform: true // 핵심: 크기가 변해도 선 두께를 균일하게 유지!
-                });
+                const rect = new fabric.Rect({ left: 100, top: 100, width: 300, height: 200, fill: 'transparent', stroke: colorPicker.value, strokeWidth: parseInt(lineWidthSlider.value), transparentCorners: false, strokeUniform: true });
                 canvas.add(rect); canvas.setActiveObject(rect);
             });
 
-            // [수정] 빈 원: strokeUniform: true 추가
             document.getElementById('btnHollowCircle').addEventListener('click', function() {
-                const circle = new fabric.Circle({ 
-                    left: 120, top: 120, radius: 150, 
-                    fill: 'transparent', 
-                    stroke: colorPicker.value, 
-                    strokeWidth: parseInt(lineWidthSlider.value), 
-                    transparentCorners: false,
-                    strokeUniform: true // 핵심: 크기가 변해도 선 두께를 균일하게 유지!
-                });
+                const circle = new fabric.Circle({ left: 120, top: 120, radius: 150, fill: 'transparent', stroke: colorPicker.value, strokeWidth: parseInt(lineWidthSlider.value), transparentCorners: false, strokeUniform: true });
                 canvas.add(circle); canvas.setActiveObject(circle);
             });
 
@@ -211,28 +266,21 @@
                 canvas.add(emojiText); canvas.setActiveObject(emojiText);
             });
 
-            // 내 스티커 추가
-            document.getElementById('btnSticker').addEventListener('click', function() {
-                document.getElementById('stickerLoader').click();
-            });
+            document.getElementById('btnSticker').addEventListener('click', function() { document.getElementById('stickerLoader').click(); });
             document.getElementById('stickerLoader').addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
+                const file = e.target.files[0]; if (!file) return;
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    const imgObj = new Image();
-                    imgObj.src = event.target.result;
+                    const imgObj = new Image(); imgObj.src = event.target.result;
                     imgObj.onload = function() {
                         const sticker = new fabric.Image(imgObj);
-                        const maxSize = canvas.width * 0.2;
-                        let scale = 1;
+                        const maxSize = canvas.width * 0.2; let scale = 1;
                         if (sticker.width > maxSize) scale = maxSize / sticker.width;
                         sticker.set({ scaleX: scale, scaleY: scale, transparentCorners: false });
                         canvas.add(sticker); canvas.viewportCenterObject(sticker); canvas.setActiveObject(sticker);
                         e.target.value = ''; 
                     };
-                };
-                reader.readAsDataURL(file);
+                }; reader.readAsDataURL(file);
             });
 
             // 4. 실시간 속성 변경
