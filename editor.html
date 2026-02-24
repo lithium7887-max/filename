@@ -1,277 +1,226 @@
+
 <!DOCTYPE html>
 <html lang="ko" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>고화질 웹 사진 편집기 🎨 | SIMPLEIMG - 무설치 온라인 이미지 마크업 툴</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>고화질 웹 사진 편집기 🎨 | SIMPLEIMG</title>
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
     
     <style>
-        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f0f2f5; text-align: center; padding: 0; margin: 0; color: #333; }
-        h2 { margin-top: 30px; margin-bottom: 25px; }
-
-        .nav-bar { text-align: center; padding: 15px 10px; background-color: #333; margin-bottom: 20px; }
-        .nav-bar a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; }
-        .nav-bar a:hover { color: #ffcc80; }
-
-        .ui-wrapper { display: block; width: 95%; max-width: 1050px; margin: 0 auto 15px; }
-        .toolbar { padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; }
-        .button-group { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-        .control-group { background: #f8f9fa; padding: 8px 15px; border-radius: 6px; display: inline-block; border: 1px solid #e9ecef; margin: 5px; vertical-align: middle; }
+        /* 기본 스타일 및 모바일 대응 */
+        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f0f2f5; text-align: center; padding: 0; margin: 0; color: #333; overflow-x: hidden; }
         
-        button, input[type="file"], select { padding: 10px 18px; margin: 4px; cursor: pointer; font-size: 14px; border: 1px solid #ddd; border-radius: 6px; background-color: #fff; transition: all 0.2s; vertical-align: middle; font-weight: 500; color: #555; }
-        button:hover { background-color: #f1f3f5; border-color: #ccc; }
+        .nav-bar { background-color: #333; padding: 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .nav-bar a { color: white; text-decoration: none; font-size: 13px; font-weight: bold; padding: 5px; }
+
+        .ui-wrapper { width: 95%; max-width: 1000px; margin: 10px auto; }
         
+        /* 🛠️ 모바일 최적화 툴바: 버튼이 자동으로 줄바꿈되고 터치하기 쉽게 변경 */
+        .toolbar { padding: 15px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); box-sizing: border-box; }
+        .button-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+        
+        button, input[type="file"], select { 
+            padding: 10px 14px; margin: 2px; cursor: pointer; font-size: 14px; border: 1px solid #ddd; 
+            border-radius: 8px; background-color: #fff; transition: all 0.2s; font-weight: 500; 
+            -webkit-appearance: none; /* iOS 스타일 제거 */
+        }
+        
+        /* 모바일에서 버튼이 너무 작지 않게 조정 */
+        @media (max-width: 600px) {
+            button { flex: 1 1 30%; font-size: 13px; padding: 12px 8px; }
+            .control-group { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+        }
+
         #btnSave { background-color: #28a745; color: white; border: none; }
-        #btnSave:hover { background-color: #218838; }
-        #btnSticker { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        #btnDelete { color: #dc3545; border-color: #dc3545; }
         #btnReset { background-color: #6c757d; color: white; border: none; }
+        #btnDelete { color: #dc3545; border-color: #dc3545; }
 
-        .help-text { background: #e7f5ff; color: #004085; padding: 15px 20px; border-radius: 10px; font-size: 14px; text-align: left; border: 1px solid #b8daff; width: 100%; box-sizing: border-box; display: flex; align-items: center; margin-bottom: 20px; }
-        .help-icon { font-size: 20px; margin-right: 15px; }
+        .control-group { background: #f8f9fa; padding: 12px; border-radius: 8px; margin: 5px; border: 1px solid #e9ecef; }
+        
+        /* 🖼️ 캔버스 컨테이너 모바일 대응 */
+        .canvas-container-wrapper { 
+            width: 100%; max-width: 1000px; min-height: 300px; margin: 15px auto; 
+            background-color: #e9ecef; border-radius: 10px; border: 2px dashed #adb5bd; 
+            overflow: hidden; touch-action: none; position: relative;
+        }
+        canvas { max-width: 100% !important; height: auto !important; }
 
-        .canvas-container-wrapper { width: 95%; max-width: 1100px; min-height: 450px; margin: 30px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #e9ecef; border-radius: 15px; border: 2px dashed #adb5bd; padding: 20px; box-sizing: border-box; overflow: auto; }
-        .canvas-container { display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; background-color: white; border-radius: 4px; }
-        .canvas-placeholder { color: #6c757d; text-align: center; }
+        /* 📝 정보 섹션 (분량 최대 유지) */
+        .info-section { max-width: 900px; margin: 30px auto; padding: 30px 20px; text-align: left; color: #444; line-height: 2.1; background: white; border-radius: 20px; }
+        .info-section h3 { color: #1a1a1a; border-left: 6px solid #007bff; padding-left: 15px; margin-top: 40px; font-size: 22px; }
+        .info-section p { margin-bottom: 18px; font-size: 15px; }
+        .policy-box { font-size: 14px; background: #f8f9fa; padding: 25px; border-radius: 12px; border: 1px solid #eee; margin-top: 30px; }
 
-        /* 🚩 대폭 강화된 하단 정보 스타일 */
-        .info-section { max-width: 1000px; margin: 40px auto; padding: 60px; text-align: left; color: #444; line-height: 2.1; background: white; border-radius: 20px; box-shadow: 0 4px 25px rgba(0,0,0,0.06); }
-        .info-section h3 { color: #1a1a1a; border-left: 6px solid #007bff; padding-left: 20px; margin-top: 50px; margin-bottom: 25px; font-size: 26px; }
-        .info-section h4 { color: #2c3e50; margin-top: 35px; margin-bottom: 15px; font-size: 20px; font-weight: 700; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        .info-section p { margin-bottom: 22px; font-size: 16px; color: #555; }
-        .info-section ul { padding-left: 20px; margin-bottom: 35px; }
-        .info-section li { margin-bottom: 15px; font-size: 16px; list-style-type: square; }
-        .policy-box { font-size: 15px; color: #555; background: #f8f9fa; padding: 35px; border: 1px solid #e9ecef; border-radius: 12px; margin-top: 35px; }
-
-        .ad-container { width: 95%; max-width: 1050px; min-height: 100px; margin: 25px auto; background-color: #fafafa; border: 1px dashed #bbb; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 10px; }
-        footer { text-align: center; padding: 70px 0; font-size: 14px; color: #888; border-top: 1px solid #eee; background-color: #fff; }
-        footer a { color: #007bff; text-decoration: none; margin: 0 15px; font-weight: 500; }
+        footer { padding: 50px 0; font-size: 13px; color: #888; background: #fff; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
 
     <div class="nav-bar">
-        <a href="index.html">🔄 파일 이름 일괄 변경</a>
-        <a href="editor.html" style="color: #ffcc80;">🎨 사진 편집 & 도장 찍기</a>
+        <a href="index.html">🔄 파일 이름 변경</a>
+        <a href="editor.html" style="color: #ffcc80;">🎨 사진 편집 & 도장</a>
     </div>
 
-    <h2>나만의 고화질 웹 사진 편집 툴 🎨</h2>
-
-    <div class="ad-container" id="top-ad"><div style="font-size: 12px; color: #aaa;">ADVERTISEMENT</div></div>
-    
-    <div class="ui-wrapper">
-        <div class="help-text">
-            <div class="help-icon">💡</div>
-            <div class="help-content">
-                <b>마우스 휠</b>: 확대/축소 | <b>Alt + 드래그</b>: 화면 이동 | <b>도형 클릭 후 색상 변경</b>: 실시간 적용 가능
-            </div>
-        </div>
-    </div>
+    <h2 style="font-size: 1.4rem; padding: 0 10px;">나만의 고화질 웹 사진 편집 툴 🎨</h2>
 
     <div class="ui-wrapper">
         <div class="toolbar">
             <div class="button-group">
-                <input type="file" id="imageLoader" accept="image/*" />
-                <button id="btnRect">🟥 빈 사각형</button>
-                <button id="btnHollowCircle">⭕ 빈 원</button>
-                <button id="btnCircle">🔵 꽉 찬 원</button>
+                <input type="file" id="imageLoader" accept="image/*" style="width: 100%; margin-bottom: 10px;"/>
+                <button id="btnRect">🟥 사각형</button>
+                <button id="btnCircle">⭕ 원형</button>
                 <button id="btnArrow">↗️ 화살표</button>
                 <button id="btnText">📝 텍스트</button>
-                <button id="btnDelete">🗑️ 선택 삭제</button>
-                <button id="btnReset">🔄 사진 초기화</button>
-                <button id="btnSave">💾 고화질 저장</button>
+                <button id="btnDelete">🗑️ 삭제</button>
+                <button id="btnReset">🔄 초기화</button>
+                <button id="btnSave">💾 저장</button>
             </div>
             
             <div class="control-group">
-                🎨 색상 변경 <input type="color" id="colorPicker" value="#FF0000"> | 
-                📏 선 두께 <input type="range" id="lineWidth" min="1" max="50" value="10">
+                🎨 <input type="color" id="colorPicker" value="#FF0000" style="width: 50px; height: 30px;">
+                📏 두께 <input type="range" id="lineWidth" min="1" max="50" value="8" style="vertical-align: middle;">
             </div>
             
             <div class="control-group" style="background: #fff9e6;">
-                😀 이모지 
-                <select id="emojiSelect">
-                    <option value="⭐">⭐ 별</option><option value="✅">✅ 체크</option><option value="❌">❌ 엑스표</option>
-                    <option value="❤️">❤️ 하트</option><option value="👍">👍 따봉</option><option value="❓">❓ 물음표</option>
-                </select>
+                이모지 <select id="emojiSelect"><option value="⭐">⭐</option><option value="✅">✅</option><option value="❤️">❤️</option></select>
                 <button id="btnEmoji">➕ 넣기</button>
-                <button id="btnSticker">🌟 내 스티커</button>
+                <button id="btnSticker">🌟 스티커</button>
                 <input type="file" id="stickerLoader" style="display: none;" />
             </div>
         </div>
     </div>
 
     <div class="canvas-container-wrapper" id="drop-area">
-        <div class="canvas-placeholder" id="placeholder-text">
-            <div style="font-size: 50px; margin-bottom: 10px;">🖼️</div>
-            <b>편집할 사진을 선택하거나 드래그하여 놓으세요.</b><br>
-            <span style="font-size: 13px; opacity: 0.8;">모든 작업은 브라우저 로컬 환경에서 안전하게 처리됩니다.</span>
+        <div id="placeholder-text" style="padding: 50px 20px; color: #6c757d;">
+            <div style="font-size: 40px;">🖼️</div>
+            <b>사진을 선택하거나 이곳에 놓으세요.</b><br>
+            <span style="font-size: 12px;">모바일은 두 손가락으로 화면을 이동/확대하세요.</span>
         </div>
         <canvas id="myCanvas"></canvas>
     </div>
 
-    <div class="ad-container" id="bottom-ad"><div style="font-size: 12px; color: #aaa;">ADVERTISEMENT</div></div>
-
     <div class="info-section">
-        <h3>1. SIMPLEIMG: 차세대 웹 기반 고화질 이미지 마크업 솔루션</h3>
-        <p>복잡한 설치 과정 없이 웹 브라우저만으로 전문가 수준의 사진 마크업이 가능합니다. <strong>SIMPLEIMG 고화질 사진 편집기</strong>는 기업용 보고서 작성, 블로그 포스팅 이미지 제작, 현장 사진 불량 체크 등 다양한 비즈니스 및 개인 용도로 최적화된 도구입니다. 최신 HTML5 Canvas 기술을 사용하여 사용자의 소중한 데이터를 서버로 전송하지 않고도 강력한 편집 기능을 구현했습니다.</p>
+        <h3>1. SIMPLEIMG: 모바일 최적화 고화질 사진 편집 솔루션</h3>
+        <p>현장의 생생한 사진 위에 즉시 마크업이 필요하신가요? <strong>SIMPLEIMG 고화질 사진 편집기</strong>는 PC와 모바일 모든 환경에서 완벽하게 작동하는 무설치 편집 툴입니다. 최신 웹 기술을 활용하여 별도의 앱 설치 없이도 사각형, 원, 화살표 등 필수 편집 기능을 제공합니다.</p>
         
-        <h4>왜 SIMPLEIMG가 특별한가요?</h4>
-        <p>일반적인 온라인 에디터들은 이미지를 서버로 업로드하여 처리하는 과정에서 해상도를 강제로 낮추거나 개인정보 유출의 위험을 안고 있습니다. 하지만 본 서비스는 '클라이언트 사이드(Client-Side)' 기술력을 바탕으로 사용자의 컴퓨터 리소스를 직접 활용하여 편집합니다. 이는 보안뿐만 아니라 처리 속도 면에서도 탁월한 이점을 제공합니다.</p>
-
-        <h3>2. 업무 효율을 극대화하는 핵심 기능 상세 안내</h3>
+        <h3>2. 모바일 사용자를 위한 특별한 조작법</h3>
+        <p>작은 화면에서도 정밀한 편집이 가능하도록 다음과 같은 기능을 지원합니다.</p>
         <ul>
-            <li><strong>지능형 실시간 스타일 변경:</strong> 이미 배치된 도형이나 텍스트를 마우스로 선택한 후 상단 툴바의 색상 피커나 선 두께 슬라이더를 조작하면, 작업물이 실시간으로 변하는 것을 확인할 수 있습니다. 번거롭게 삭제하고 다시 그릴 필요가 없습니다.</li>
-            <li><strong>초고화질 원본 유지 저장:</strong> 원본 이미지의 픽셀 정보를 손실 없이 캔버스에 렌더링합니다. '고화질 저장' 기능을 사용하면 편집된 요소들이 포함된 상태로 원본의 해상도를 최대한 유지한 PNG 파일을 얻을 수 있습니다.</li>
-            <li><strong>정밀 뷰포트 조작:</strong> 마우스 휠을 통한 자유로운 확대/축소 기능과 Alt 키를 활용한 드래그 이동(Pan) 기능을 조합하면, 4K 이상의 초고해상도 이미지도 미세한 단위까지 정밀하게 마킹할 수 있습니다.</li>
-            <li><strong>커스텀 스티커 시스템:</strong> 개인이나 기업이 사용하는 로고, 서명 이미지를 '내 스티커' 기능을 통해 즉시 불러올 수 있습니다. 투명 PNG 파일을 지원하여 사진 위에 워터마크를 찍는 용도로 매우 유용합니다.</li>
+            <li><strong>두 손가락 화면 이동:</strong> 이미지를 확대한 상태에서 두 손가락으로 드래그하면 화면을 자유롭게 이동할 수 있습니다.</li>
+            <li><strong>핀치 투 줌:</strong> 두 손가락을 벌리거나 오므려 이미지를 실시간으로 확대 및 축소하세요.</li>
+            <li><strong>실시간 색상 변경:</strong> 도형을 터치하여 선택한 후 색상을 바꾸면 즉시 반영됩니다.</li>
         </ul>
 
-        <h3>3. 사용자 중심의 인터페이스 가이드 (FAQ)</h3>
-        <h4>Q: 사진을 여러 장 한꺼번에 편집할 수 있나요?</h4>
-        <p>A: 현재 버전은 단일 이미지에 대한 정밀 편집을 지원합니다. 한 장의 편집을 마치고 '사진 초기화' 버튼을 눌러 다음 작업을 즉시 진행할 수 있습니다.</p>
-        <h4>Q: 텍스트 폰트 크기는 어떻게 조절하나요?</h4>
-        <p>A: 텍스트를 입력한 후 마우스로 텍스트 상자의 모서리를 드래그하면 자유롭게 크기를 조절할 수 있습니다. 또한 텍스트가 선택된 상태에서 색상을 변경하여 가독성을 높일 수 있습니다.</p>
-        <h4>Q: 인터넷 연결이 끊겨도 작동하나요?</h4>
-        <p>A: 네, 사이트가 한 번 로딩된 후에는 모든 기능이 사용자의 기기 내부 메모리에서 작동하므로 오프라인 환경에서도 안정적인 편집이 가능합니다.</p>
-
-        <h3>4. 개인정보처리방침 (Privacy Policy)</h3>
+        <h3>3. 개인정보처리방침 및 보안 안내</h3>
         <div class="policy-box">
-            <p><strong>제1조 (데이터 보안)</strong> 사용자가 편집을 위해 선택하는 모든 사진 파일은 당사의 서버로 전송되거나 저장되지 않습니다. 모든 편집 데이터는 사용자의 웹 브라우저 내에서 실시간으로 처리된 후 휘발됩니다.</p>
-            <p><strong>제2조 (제3자 서비스 이용)</strong> 본 서비스는 Google AdSense를 통해 수익을 창출하며, Google은 광고 제공을 위해 쿠키를 활용할 수 있습니다. 이는 사용자의 기기 식별을 위한 최소한의 데이터이며, 당사는 이를 직접 수집하지 않습니다.</p>
-            <p><strong>제3조 (쿠키 활용)</strong> 사이트 방문 통계 분석 및 광고 성과 측정을 위해 쿠키를 사용할 수 있으며, 사용자는 브라우저 설정을 통해 이를 거부할 권리가 있습니다.</p>
-            <p style="margin-top: 20px; font-weight: bold; border-top: 1px solid #ddd; padding-top: 15px;">최종 업데이트일: 2026년 2월 25일 | 책임 관리자: SIMPLEIMG 팀</p>
+            <p>본 서비스는 '로컬 처리' 방식을 사용합니다. 귀하가 업로드한 이미지는 서버로 전송되지 않으며, 모든 편집 데이터는 브라우저 내부 메모리에서만 처리된 후 종료 시 삭제됩니다. (최종수정: 2026-02-25)</p>
         </div>
-
-        <h3>5. 이용 약관 및 법적 고지</h3>
-        <p>본 서비스는 모든 사용자에게 무료로 개방되어 있습니다. 단, 결과물을 불법적인 용도로 배포하거나 타인의 권리를 침해하는 용도로 사용하는 것에 대한 모든 법적 책임은 사용자 본인에게 있습니다. 기술적인 오류로 인한 결과물의 손실에 대해서는 보상이 어려우므로 중요 작업 시 주의를 당부드립니다.</p>
         
-        <h3>6. 기술 지원 및 향후 업데이트 계획</h3>
-        <p>SIMPLEIMG는 현재 제공되는 사각형, 원형, 화살표 도구 외에도 향후 자유 곡선 그리기, 이미지 필터 효과, 레이어 정렬 기능 등 전문성을 더할 수 있는 기능들을 꾸준히 업데이트할 예정입니다. 불편한 점이나 제안 사항이 있다면 고객 센터 메일로 언제든 연락 주시기 바랍니다.</p>
+        <h3>4. 자주 묻는 질문 (FAQ)</h3>
+        <p><b>Q: 저장 시 화질이 깨지나요?</b><br>A: 원본 픽셀을 최대한 보존하는 고성능 렌더링을 사용하여 깨짐 없는 저장을 지원합니다.</p>
+        <p><b>Q: 모바일에서 사진이 안 움직여요.</b><br>A: 반드시 두 손가락을 동시에 사용하여 드래그해 주세요.</p>
     </div>
 
     <footer>
-        <p><b>© 2026 SIMPLEIMG. All rights reserved.</b></p>
-        <p style="margin: 25px 0;">
-            <a href="privacy.html">개인정보처리방침</a> | <a href="terms.html">이용약관</a> | <a href="contact.html">제휴 문의</a>
-        </p>
-        <p style="font-size: 13px; color: #aaa;">Email: admin@simpleimg.co.kr | No-Install High Quality Photo Editor</p>
+        <p>© 2026 SIMPLEIMG. admin@simpleimg.co.kr</p>
     </footer>
 
     <script>
-        if (typeof fabric !== 'undefined') {
-            fabric.Object.prototype.set({ cornerSize: 12, transparentCorners: false, borderColor: '#007bff', cornerColor: '#007bff' });
-        }
-
         window.onload = function() {
-            const canvas = new fabric.Canvas('myCanvas');
+            const canvas = new fabric.Canvas('myCanvas', { 
+                allowTouchScrolling: true, // 모바일 기본 스크롤 허용
+                stopTouchPropagation: false
+            });
             const colorPicker = document.getElementById('colorPicker');
             const lineWidthSlider = document.getElementById('lineWidth');
-            const emojiSelect = document.getElementById('emojiSelect');
-            const placeholder = document.getElementById('placeholder-text');
-            const dropArea = document.getElementById('drop-area');
             const fileInput = document.getElementById('imageLoader');
 
-            // 🎨 실시간 스타일 업데이트 함수 (유지)
-            function updateActiveObjectStyle() {
-                const activeObj = canvas.getActiveObject();
-                if (!activeObj) return;
+            // --- [모바일 터치 이동 및 줌 로직] ---
+            let isDragging = false;
+            let lastPosX, lastPosY, lastDist = 0;
 
-                const color = colorPicker.value;
-                const width = parseInt(lineWidthSlider.value);
-
-                if (activeObj.type === 'i-text' || activeObj.type === 'text') {
-                    activeObj.set('fill', color);
-                } else if (activeObj.type === 'path' || (activeObj.fill && activeObj.fill !== 'transparent')) {
-                    activeObj.set('fill', color);
-                    if (activeObj.stroke) activeObj.set('stroke', color);
-                } else {
-                    activeObj.set('stroke', color);
-                    activeObj.set('strokeWidth', width);
+            canvas.on('mouse:down', function(opt) {
+                const evt = opt.e;
+                if (evt.altKey || (evt.touches && evt.touches.length === 2)) {
+                    isDragging = true;
+                    canvas.selection = false;
+                    lastPosX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+                    lastPosY = evt.touches ? evt.touches[0].clientY : evt.clientY;
                 }
+            });
+
+            canvas.on('mouse:move', function(opt) {
+                if (isDragging) {
+                    const evt = opt.e;
+                    const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+                    const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+                    const vpt = canvas.viewportTransform;
+                    vpt[4] += clientX - lastPosX;
+                    vpt[5] += clientY - lastPosY;
+                    canvas.requestRenderAll();
+                    lastPosX = clientX; lastPosY = clientY;
+
+                    if (evt.touches && evt.touches.length === 2) {
+                        let dist = Math.hypot(evt.touches[0].pageX - evt.touches[1].pageX, evt.touches[0].pageY - evt.touches[1].pageY);
+                        if (lastDist > 0) {
+                            let zoom = canvas.getZoom() * (dist / lastDist);
+                            canvas.zoomToPoint({ x: (evt.touches[0].pageX + evt.touches[1].pageX)/2, y: (evt.touches[0].pageY + evt.touches[1].pageY)/2 }, zoom);
+                        }
+                        lastDist = dist;
+                    }
+                }
+            });
+
+            canvas.on('mouse:up', function() { isDragging = false; lastDist = 0; canvas.selection = true; });
+
+            // 실시간 스타일 변경 (유지)
+            function updateStyle() {
+                const obj = canvas.getActiveObject();
+                if (!obj) return;
+                const color = colorPicker.value;
+                if (obj.type.includes('text')) obj.set('fill', color);
+                else if (obj.fill !== 'transparent') obj.set({fill: color, stroke: color});
+                else obj.set({stroke: color, strokeWidth: parseInt(lineWidthSlider.value)});
                 canvas.renderAll();
             }
+            colorPicker.oninput = updateStyle;
+            lineWidthSlider.oninput = updateStyle;
 
-            colorPicker.oninput = updateActiveObjectStyle;
-            lineWidthSlider.oninput = updateActiveObjectStyle;
-
-            // 📷 사진 업로드
+            // 파일 로드
             fileInput.onchange = function(e) {
                 const file = e.target.files[0];
-                if (!file) return;
                 const reader = new FileReader();
                 reader.onload = function(f) {
-                    const imgObj = new Image();
-                    imgObj.src = f.target.result;
-                    imgObj.onload = function() {
-                        placeholder.style.display = 'none';
-                        dropArea.style.minHeight = 'auto';
-                        dropArea.style.border = 'none';
-                        dropArea.style.background = 'transparent';
-                        canvas.setWidth(this.width);
-                        canvas.setHeight(this.height);
-                        const fImg = new fabric.Image(imgObj);
-                        canvas.setBackgroundImage(fImg, canvas.renderAll.bind(canvas));
-                        const container = document.querySelector('.canvas-container');
-                        if(container) container.style.display = 'block';
-                        canvas.setViewportTransform([1,0,0,1,0,0]);
-                    };
+                    fabric.Image.fromURL(f.target.result, function(img) {
+                        document.getElementById('placeholder-text').style.display = 'none';
+                        // 모바일 화면 폭에 맞춰 캔버스 크기 조정
+                        const maxWidth = document.querySelector('.canvas-container-wrapper').clientWidth;
+                        const scale = maxWidth / img.width;
+                        canvas.setWidth(img.width); canvas.setHeight(img.height);
+                        canvas.setBackgroundImage(img, canvas.renderAll.bind(canvas));
+                        if(scale < 1) canvas.setZoom(scale); // 모바일에서 너무 크면 축소 시작
+                    });
                 };
                 reader.readAsDataURL(file);
             };
 
-            // 🔄 초기화 기능
-            document.getElementById('btnReset').onclick = function() {
-                if (confirm('편집 내용과 사진이 모두 사라집니다. 초기화할까요?')) {
-                    canvas.clear();
-                    canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
-                    const container = document.querySelector('.canvas-container');
-                    if(container) container.style.display = 'none';
-                    placeholder.style.display = 'block';
-                    dropArea.style.minHeight = '450px';
-                    dropArea.style.border = '2px dashed #adb5bd';
-                    dropArea.style.background = '#e9ecef';
-                    fileInput.value = "";
-                }
-            };
-
-            // 조작 기능
-            canvas.on('mouse:wheel', function(opt) {
-                var delta = opt.e.deltaY;
-                var zoom = canvas.getZoom();
-                zoom *= 0.999 ** delta;
-                if (zoom > 20) zoom = 20; if (zoom < 0.1) zoom = 0.1;
-                canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
-                opt.e.preventDefault(); opt.e.stopPropagation();
-            });
-            canvas.on('mouse:down', function(opt) { if (opt.e.altKey) { this.isDragging = true; this.lastPosX = opt.e.clientX; this.lastPosY = opt.e.clientY; canvas.defaultCursor = 'grabbing'; } });
-            canvas.on('mouse:move', function(opt) { if (this.isDragging) { var vpt = this.viewportTransform; vpt[4] += opt.e.clientX - this.lastPosX; vpt[5] += opt.e.clientY - this.lastPosY; this.requestRenderAll(); this.lastPosX = opt.e.clientX; this.lastPosY = opt.e.clientY; } });
-            canvas.on('mouse:up', function() { this.isDragging = false; canvas.defaultCursor = 'default'; });
-
-            // 도형 생성 도구
-            document.getElementById('btnRect').onclick = () => canvas.add(new fabric.Rect({ left: 100, top: 100, width: 200, height: 150, fill: 'transparent', stroke: colorPicker.value, strokeWidth: parseInt(lineWidthSlider.value), strokeUniform: true }));
-            document.getElementById('btnHollowCircle').onclick = () => canvas.add(new fabric.Circle({ left: 100, top: 100, radius: 80, fill: 'transparent', stroke: colorPicker.value, strokeWidth: parseInt(lineWidthSlider.value), strokeUniform: true }));
-            document.getElementById('btnCircle').onclick = () => canvas.add(new fabric.Circle({ left: 100, top: 100, radius: 80, fill: colorPicker.value }));
+            // 버튼 기능들
+            document.getElementById('btnRect').onclick = () => canvas.add(new fabric.Rect({ left: 100, top: 100, width: 150, height: 100, fill: 'transparent', stroke: colorPicker.value, strokeWidth: 5 }));
+            document.getElementById('btnCircle').onclick = () => canvas.add(new fabric.Circle({ left: 100, top: 100, radius: 60, fill: 'transparent', stroke: colorPicker.value, strokeWidth: 5 }));
             document.getElementById('btnArrow').onclick = () => canvas.add(new fabric.Path('M 0 20 L 80 20 L 80 0 L 120 30 L 80 60 L 80 40 L 0 40 Z', { left: 100, top: 100, fill: colorPicker.value }));
-            document.getElementById('btnText').onclick = () => canvas.add(new fabric.IText('텍스트 입력', { left: 100, top: 100, fill: colorPicker.value, fontSize: 50 }));
-            document.getElementById('btnEmoji').onclick = () => canvas.add(new fabric.Text(emojiSelect.value, { left: 100, top: 100, fontSize: 100 }));
+            document.getElementById('btnText').onclick = () => canvas.add(new fabric.IText('텍스트 입력', { left: 100, top: 100, fill: colorPicker.value }));
+            document.getElementById('btnEmoji').onclick = () => canvas.add(new fabric.Text(document.getElementById('emojiSelect').value, { left: 100, top: 100, fontSize: 80 }));
             document.getElementById('btnDelete').onclick = () => canvas.remove(canvas.getActiveObject());
-            window.addEventListener('keydown', (e) => { if ((e.key==='Delete'||e.key==='Backspace') && !canvas.getActiveObject()?.isEditing) canvas.remove(canvas.getActiveObject()); });
-            
-            document.getElementById('btnSticker').onclick = () => document.getElementById('stickerLoader').click();
-            document.getElementById('stickerLoader').onchange = (e) => {
-                const reader = new FileReader();
-                reader.onload = (f) => fabric.Image.fromURL(f.target.result, (img) => { img.scale(0.2); canvas.add(img).centerObject(img).setActiveObject(img); });
-                reader.readAsDataURL(e.target.files[0]);
-            };
-
+            document.getElementById('btnReset').onclick = () => { if(confirm('전체 초기화하시겠습니까?')) location.reload(); };
             document.getElementById('btnSave').onclick = () => {
                 canvas.discardActiveObject().renderAll();
                 const link = document.createElement('a');
-                link.download = 'SIMPLEIMG_EDITED.png';
-                link.href = canvas.toDataURL({ format: 'png', quality: 1, enableRetinaScaling: true });
+                link.download = 'SIMPLEIMG_EDIT.png';
+                link.href = canvas.toDataURL({ format: 'png', quality: 1 });
                 link.click();
             };
         };
