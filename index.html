@@ -3,268 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이미지 파일 이름 일괄 변환기 - 무료 대량 변경 프로그램 | 내 블로그 이름</title>
-    <meta name="description" content="쇼핑몰 상품 등록, 사진 정리 필수 툴! 복잡한 설치 없이 브라우저에서 바로 이미지 파일 이름을 일괄 변경하고 랜덤 조합, 자동 넘버링까지 적용해 보세요.">
+    <title>이미지 파일 이름 일괄 변환기 - 무료 대량 변경 프로그램 | SIMPLEIMG</title>
+    <meta name="description" content="쇼핑몰 상품 등록, 사진 정리 필수 툴! 복잡한 설치 없이 브라우저에서 바로 이미지 파일 이름을 일괄 변경하고 자동 넘버링까지 적용해 보세요.">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-본인아이디" crossorigin="anonymous"></script>
 
     <style>
-        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; margin: 0; padding: 0; color: #333; background-color: #f4f7f6; line-height: 1.6; }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; background-color: #fff; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+        body { font-family: 'Malgun Gothic', sans-serif; margin: 0; padding: 0; color: #333; background-color: #f4f7f6; line-height: 1.6; }
+        .container { max-width: 800px; margin: 20px auto; padding: 25px; background-color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 12px; }
         
-        header { background-color: #2c3e50; color: white; padding: 15px 20px; text-align: center; }
-        header nav a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; font-size: 15px; }
-        header nav a:hover { color: #4CAF50; }
+        header { background-color: #2c3e50; color: white; padding: 15px 0; text-align: center; margin-bottom: 20px; }
+        header nav a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; }
 
-        h1, h2, h3 { color: #2c3e50; }
-        h1 { font-size: 24px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        textarea { width: 100%; height: 120px; margin: 10px 0; padding: 10px; box-sizing: border-box; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
-        button.action-btn { padding: 15px 20px; font-weight: bold; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px; width: 100%; font-size: 18px; margin-top: 10px; transition: background-color 0.3s; }
-        button.action-btn:hover { background-color: #45a049; }
-        .tool-section { background-color: #fafafa; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 25px; }
-        .status { margin-top: 10px; font-weight: bold; color: #0066cc; }
-        .options-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        label { cursor: pointer; display: flex; align-items: center; font-size: 15px; }
-        input[type="number"] { padding: 4px; margin: 0 5px; border: 1px solid #ccc; border-radius: 4px; width: 50px; }
-        input[type="number"]:disabled { background-color: #eee; cursor: not-allowed; }
+        h1 { font-size: 26px; color: #2c3e50; text-align: center; margin-bottom: 30px; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; }
+        h3 { color: #2e7d32; border-left: 4px solid #4CAF50; padding-left: 10px; margin-top: 30px; }
 
-        .ad-container { text-align: center; margin: 25px 0; min-height: 90px; background-color: #f9f9f9; border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #aaa; border-radius: 5px; display: none; }
-
-        /* 🎨 파일 업로드 버튼 스타일 */
-        .upload-wrapper { margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .upload-wrapper input[type="file"] { display: none; }
-        .custom-file-btn { display: inline-block; padding: 10px 15px; background-color: #fff; border: 1px solid #aaa; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; color: #333; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .custom-file-btn:hover { background-color: #e9ecef; border-color: #888; }
-
-        /* ✨ 새로 추가된 드래그 앤 드롭 영역 스타일 */
+        /* ✨ 드래그 앤 드롭 영역 */
         .drop-zone {
-            border: 2px dashed #ccc;
-            border-radius: 8px;
-            padding: 40px 20px;
-            text-align: center;
-            background-color: #fff;
-            color: #666;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            border: 3px dashed #4CAF50; border-radius: 15px; padding: 50px 20px;
+            text-align: center; background-color: #f9fff9; color: #2e7d32;
+            cursor: pointer; transition: 0.3s; margin-bottom: 20px;
         }
-        /* 파일을 끌어다 올렸을 때 색상 변화 */
-        .drop-zone.dragover {
-            background-color: #e8f5e9;
-            border-color: #4CAF50;
-            color: #2e7d32;
+        .drop-zone.dragover { background-color: #e8f5e9; transform: scale(1.02); }
+        
+        /* 🚫 기본 버튼 숨기기 (중복 방지) */
+        input[type="file"] { display: none !important; }
+        
+        .btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .custom-btn {
+            background: white; border: 2px solid #4CAF50; color: #4CAF50;
+            padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
+        .custom-btn:hover { background: #4CAF50; color: white; }
 
-        .content-guide { padding: 20px 0; border-top: 1px solid #eee; margin-top: 30px; }
-        .content-guide h3 { font-size: 18px; margin-top: 25px; color: #0066cc; }
-        .content-guide p, .content-guide li { font-size: 15px; color: #555; margin-bottom: 8px; }
-        .content-guide ul { padding-left: 20px; }
-        .highlight { background-color: #eef7ff; padding: 15px; border-radius: 5px; border-left: 4px solid #0066cc; margin-top: 20px; }
+        textarea { width: 100%; height: 120px; margin: 15px 0; padding: 15px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .action-btn { width: 100%; padding: 18px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .action-btn:hover { background: #45a049; }
 
-        footer { text-align: center; padding: 30px 20px; background-color: #f1f1f1; font-size: 13px; color: #666; margin-top: 40px; }
-        footer a { color: #666; text-decoration: none; margin: 0 10px; }
-        footer a:hover { text-decoration: underline; color: #333; }
+        .status { text-align: center; font-weight: bold; color: #0066cc; margin: 15px 0; font-size: 18px; }
+        .ad-container { text-align: center; margin: 20px 0; padding: 20px; background: #eee; border-radius: 8px; color: #888; font-size: 12px; }
+
+        /* 가이드 텍스트 스타일 */
+        .content-guide { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; }
+        .content-guide p { font-size: 15px; color: #555; }
+        .highlight-box { background: #eef7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #0066cc; margin: 15px 0; }
+        
+        footer { text-align: center; padding: 30px; font-size: 13px; color: #999; }
     </style>
 </head>
 <body>
 
-    <header>
-        <nav>
-            <a href="#">🏠 홈 (블로그)</a>
-            <a href="#">IT 정보/팁</a>
-            <a href="#">✨ 유용한 도구 모음</a>
-            <a href="#">문의하기</a>
-        </nav>
-    </header>
+<header>
+    <nav>
+        <a href="https://simpleimg.co.kr">홈</a>
+        <a href="#">사용 방법</a>
+        <a href="#">문의하기</a>
+    </nav>
+</header>
 
-    <div class="container">
-        <h1>이미지 파일 이름 일괄 변환기 🔄</h1>
+<div class="container">
+    <h1>SIMPLEIMG 이미지 이름 일괄 변환기 🔄</h1>
 
-        <div class="ad-container">[구글 애드센스 상단 광고 영역]</div>
+    <div class="ad-container">[애드센스 상단 광고]</div>
 
-        <div class="tool-section">
-            <h3>1. 이미지 파일 또는 폴더 업로드</h3>
+    <div id="dropZone" class="drop-zone">
+        <div style="font-size: 40px;">📥</div>
+        <b>이미지 파일 또는 폴더를 이곳에 드래그하세요!</b>
+        <p style="font-size: 14px;">보안을 위해 파일은 서버로 전송되지 않고 브라우저에서 즉시 처리됩니다.</p>
+        
+        <div class="btn-group">
+            <label for="fileInput" class="custom-btn">📄 파일 선택</label>
+            <input type="file" id="fileInput" multiple accept="image/*">
             
-            <div id="dropZone" class="drop-zone">
-                📥 이곳에 이미지 파일들을 마우스로 끌어다 놓으세요.
-                <div style="font-size: 13px; font-weight: normal; margin-top: 10px; color: #999;">또는 아래 버튼을 눌러서 선택하세요.</div>
-            </div>
-
-            <div class="upload-wrapper">
-                <input type="file" id="fileInput" multiple accept="image/*">
-                <label for="fileInput" class="custom-file-btn">📄 개별 파일 선택</label>
-                
-                <input type="file" id="folderInput" webkitdirectory directory>
-                <label for="folderInput" class="custom-file-btn">📁 폴더 통째로 선택</label>
-            </div>
-            
-            <div style="text-align: center; margin-top: 15px;">
-                <div class="status" id="fileCount">현재 선택된 이미지: 0개</div>
-                <button onclick="clearFiles()" style="background-color: #777; color:white; border:none; border-radius:4px; padding: 6px 12px; font-size: 12px; cursor:pointer; margin-top: 10px;">선택 초기화</button>
-            </div>
-        </div>
-
-        <div class="tool-section">
-            <h3>2. 변환할 이름 입력 및 옵션 설정</h3>
-            <p style="font-size: 13px; color: #666; margin-top:0;">💡 <b>입력 팁:</b> 단어와 단어는 쉼표(,) 또는 줄바꿈으로 구분하세요.</p>
-            <textarea id="nameInput" placeholder="이곳에 새 파일 이름이나 단어들을 입력하세요."></textarea>
-
-            <div class="options-group">
-                <label>
-                    <input type="checkbox" id="optNumbering" checked>
-                    ✔️ <b>자동 번호 매기기</b> (이름 뒤에 _01, _02 형식으로 번호 부여)
-                </label>
-                <label>
-                    <input type="checkbox" id="optRandom" onchange="toggleRandomInput()">
-                    🎲 <b>단어 랜덤 조합</b> (입력한 단어 중 무작위로 추출하여 이름 생성)
-                </label>
-                <div style="margin-left: 25px; font-size: 14px; color: #555;">
-                    └ 조합할 단어 개수: <input type="number" id="randomCount" value="1" min="1" max="10" disabled> 개
-                </div>
-            </div>
-        </div>
-
-        <div class="ad-container" style="margin-bottom: 20px;">[구글 애드센스 하단 광고 영역]</div>
-
-        <button class="action-btn" onclick="renameAndDownload()">변환 및 압축 파일(.zip) 다운로드</button>
-
-        <div class="content-guide">
-            <h2>웹 브라우저에서 바로 쓰는 무료 파일명 변경 프로그램</h2>
-            <p>수십, 수백 장의 사진 파일 이름을 하나씩 바꾸느라 고생하고 계신가요? 이 <b>무료 이미지 이름 일괄 변환기</b>를 사용하면 별도의 프로그램 설치나 서버 업로드 과정 없이, 여러분의 웹 브라우저 내에서 안전하고 빠르게 대량의 파일명을 변경할 수 있습니다.</p>
-
-            <h3>📌 이 도구를 만든 목적과 장점</h3>
-            <ul>
-                <li><b>개인정보 보호 완벽:</b> 이미지가 서버로 전송되지 않고 사용자의 PC 내에서만 처리되므로 유출 위험이 0%입니다.</li>
-                <li><b>강력한 커스텀 옵션:</b> 단순한 순차적 이름 변경뿐만 아니라, 여러 단어를 랜덤하게 조합하는 고도의 네이밍 기능을 제공합니다.</li>
-                <li><b>작업 시간 단축:</b> 클릭 몇 번이면 수백 장의 파일이 지정된 규칙에 따라 새로운 이름으로 매핑되어 하나의 ZIP 파일로 깔끔하게 압축됩니다.</li>
-            </ul>
+            <label for="folderInput" class="custom-btn">📁 폴더 선택</label>
+            <input type="file" id="folderInput" webkitdirectory directory>
         </div>
     </div>
 
-    <footer>
-        <p>Copyright © 2024 내 블로그/사이트 이름. All rights reserved.</p>
-        <div style="margin-top: 10px;">
-            <a href="#">이용약관 (Terms of Service)</a> | 
-            <a href="#">개인정보처리방침 (Privacy Policy)</a> | 
-            <a href="#">문의하기 (Contact)</a>
+    <div class="status" id="fileStatus">선택된 이미지: 0개</div>
+
+    <textarea id="nameInput" placeholder="변경할 이름들을 쉼표(,) 또는 엔터로 구분하여 입력하세요.&#10;예: 상품사진, 아이템, 리뷰"></textarea>
+
+    <div class="ad-container">[애드센스 중단 광고]</div>
+
+    <button class="action-btn" onclick="generateZip()">이름 변환 후 압축 파일 다운로드</button>
+
+    <div class="content-guide">
+        <h3>📌 SIMPLEIMG 사용 가이드</h3>
+        <p>본 도구는 대량의 이미지 파일 이름을 규칙에 따라 한 번에 변경해야 하는 분들을 위해 제작되었습니다. 쇼핑몰 운영자, 블로거, 사진 작가분들에게 특히 유용합니다.</p>
+        
+        <div class="highlight-box">
+            <b>사용 팁:</b> 이름을 하나만 입력하면 '이름_01', '이름_02' 식으로 번호가 붙고, 이름을 여러 개 입력하면 입력한 순서대로 파일명에 매칭됩니다.
         </div>
-    </footer>
 
-    <script>
-        let selectedFiles = [];
+        <h3>✅ 주요 특징</h3>
+        <ul>
+            <li><b>개인정보 보호:</b> 이미지가 외부 서버로 절대 업로드되지 않습니다.</li>
+            <li><b>폴더 드래그 지원:</b> 폴더를 통째로 던져넣어도 내부 이미지를 모두 인식합니다.</li>
+            <li><b>무료 및 무설치:</b> 웹 브라우저만 있으면 언제 어디서나 바로 사용 가능합니다.</li>
+        </ul>
 
-        const fileInput = document.getElementById('fileInput');
-        const folderInput = document.getElementById('folderInput');
-        const fileCountDisplay = document.getElementById('fileCount');
-        const dropZone = document.getElementById('dropZone');
+        <h3>❓ 자주 묻는 질문(FAQ)</h3>
+        <p><b>Q: 변환된 파일은 어디 있나요?</b><br>A: 변환이 완료되면 자동으로 .zip 압축 파일이 생성되어 '다운로드' 폴더에 저장됩니다.</p>
+        <p><b>Q: 파일 개수 제한이 있나요?</b><br>A: 개수 제한은 없으나, PC 사양에 따라 한 번에 200장 내외로 작업하시는 것을 추천합니다.</p>
+    </div>
+</div>
 
-        // 파일 병합 및 개수 업데이트 함수
-        function processFiles(newFiles) {
-            const imageFiles = newFiles.filter(file => file.type.startsWith('image/'));
-            selectedFiles = selectedFiles.concat(imageFiles);
-            fileCountDisplay.innerText = `현재 선택된 이미지: ${selectedFiles.length}개`;
+<footer>
+    <p>© 2026 SIMPLEIMG. All rights reserved.</p>
+    <p><a href="#" onclick="alert('개인정보처리방침: 본 사이트는 파일을 서버로 전송하지 않으며 개인정보를 수집하지 않습니다.');">개인정보처리방침</a> | <a href="#">이용약관</a></p>
+</footer>
+
+<script>
+    let files = [];
+    const dropZone = document.getElementById('dropZone');
+    const fileStatus = document.getElementById('fileStatus');
+
+    async function handleEntry(entry) {
+        if (entry.isFile) {
+            const file = await new Promise(res => entry.file(res));
+            if (file.type.startsWith('image/')) files.push(file);
+        } else if (entry.isDirectory) {
+            const reader = entry.createReader();
+            let entries = await new Promise(res => reader.readEntries(res));
+            for (const e of entries) await handleEntry(e);
         }
+    }
 
-        // 버튼 클릭을 통한 업로드 이벤트
-        fileInput.addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
-        folderInput.addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
-
-        // ✨ 드래그 앤 드롭 이벤트 처리 ✨
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault(); // 필수: 이걸 막아줘야 드롭이 허용됨
-            dropZone.classList.add('dragover'); // 마우스 올렸을 때 시각적 효과
-        });
-
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover'); // 마우스 벗어나면 원래대로
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            
-            // 드롭된 파일 가져와서 병합
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                processFiles(Array.from(e.dataTransfer.files));
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', async e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        const items = e.dataTransfer.items;
+        if (items) {
+            for (let item of items) {
+                const entry = item.webkitGetAsEntry();
+                if (entry) await handleEntry(entry);
             }
+        }
+        updateStatus();
+    });
+
+    document.getElementById('fileInput').addEventListener('change', e => { addFiles(e.target.files); });
+    document.getElementById('folderInput').addEventListener('change', e => { addFiles(e.target.files); });
+
+    function addFiles(newFiles) {
+        for (let f of newFiles) if (f.type.startsWith('image/')) files.push(f);
+        updateStatus();
+    }
+
+    function updateStatus() {
+        fileStatus.innerText = `현재 선택된 이미지: ${files.length}개`;
+    }
+
+    async function generateZip() {
+        if (files.length === 0) return alert("이미지를 먼저 추가해주세요!");
+        const nameVal = document.getElementById('nameInput').value;
+        const names = nameVal.split(/,|\n/).map(n => n.trim()).filter(n => n);
+        if (names.length === 0) return alert("변경할 이름을 입력해주세요.");
+
+        const btn = document.querySelector('.action-btn');
+        btn.innerText = "압축 파일 생성 중... 🚀";
+        btn.disabled = true;
+
+        const zip = new JSZip();
+        files.forEach((file, i) => {
+            const ext = file.name.split('.').pop();
+            const baseName = names.length === 1 ? names[0] : (names[i] || "unnamed");
+            const finalName = `${baseName}_${String(i+1).padStart(2, '0')}`;
+            zip.file(`${finalName}.${ext}`, file);
         });
 
-        // 초기화
-        function clearFiles() {
-            selectedFiles = [];
-            fileInput.value = "";
-            folderInput.value = "";
-            fileCountDisplay.innerText = `현재 선택된 이미지: 0개`;
-        }
-
-        // 옵션 토글
-        function toggleRandomInput() {
-            const isRandomChecked = document.getElementById('optRandom').checked;
-            document.getElementById('randomCount').disabled = !isRandomChecked;
-        }
-
-        // 압축 및 다운로드 로직 (이전과 동일)
-        function renameAndDownload() {
-            let namesText = document.getElementById('nameInput').value;
-            const names = namesText.replace(/\n/g, ',').split(',').map(name => name.trim()).filter(name => name !== '');
-            
-            if (selectedFiles.length === 0) return alert("이미지 파일을 선택하거나 폴더를 업로드해주세요.");
-            if (names.length === 0) return alert("변경할 단어를 하나 이상 입력해주세요.");
-
-            const useNumbering = document.getElementById('optNumbering').checked;
-            const useRandom = document.getElementById('optRandom').checked;
-            const randomCount = parseInt(document.getElementById('randomCount').value, 10) || 1;
-
-            const zip = new JSZip();
-            const digitLength = String(selectedFiles.length).length;
-            const usedNamesCount = {};
-
-            const btn = document.querySelector('.action-btn');
-            btn.innerText = "압축 파일 생성 중... 잠시만 기다려주세요⏳";
-            btn.style.backgroundColor = "#ff9800";
-
-            setTimeout(() => {
-                for (let i = 0; i < selectedFiles.length; i++) {
-                    const file = selectedFiles[i];
-                    const extension = file.name.substring(file.name.lastIndexOf('.'));
-                    let baseName = "";
-                    
-                    if (useRandom) {
-                        let randomWordsArray = [];
-                        for (let j = 0; j < randomCount; j++) {
-                            const randomIndex = Math.floor(Math.random() * names.length);
-                            randomWordsArray.push(names[randomIndex]);
-                        }
-                        baseName = randomWordsArray.join('_');
-                    } else {
-                        baseName = names.length === 1 ? names[0] : (names[i] ? names[i] : `unnamed`); 
-                    }
-                    
-                    if (useNumbering) {
-                        baseName = `${baseName}_${String(i + 1).padStart(digitLength, '0')}`;
-                    } else {
-                        if (usedNamesCount[baseName]) {
-                            usedNamesCount[baseName]++;
-                            baseName = `${baseName}_${usedNamesCount[baseName]}`;
-                        } else {
-                            usedNamesCount[baseName] = 1;
-                        }
-                    }
-                    
-                    zip.file(baseName + extension, file);
-                }
-                
-                zip.generateAsync({type:"blob"}).then(function(content) {
-                    saveAs(content, "renamed_images.zip");
-                    btn.innerText = "변환 및 압축 파일(.zip) 다운로드";
-                    btn.style.backgroundColor = "#4CAF50";
-                });
-            }, 100);
-        }
-    </script>
+        const content = await zip.generateAsync({type: "blob"});
+        saveAs(content, "simpleimg_result.zip");
+        
+        btn.innerText = "이름 변환 후 압축 파일 다운로드";
+        btn.disabled = false;
+    }
+</script>
 </body>
 </html>
+
