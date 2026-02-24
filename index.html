@@ -39,3 +39,232 @@
         .custom-file-btn:hover { background-color: #e9ecef; border-color: #888; }
 
         /* ✨ 새로 추가된 드래그 앤 드롭 영역 스타일 */
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            background-color: #fff;
+            color: #666;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        /* 파일을 끌어다 올렸을 때 색상 변화 */
+        .drop-zone.dragover {
+            background-color: #e8f5e9;
+            border-color: #4CAF50;
+            color: #2e7d32;
+        }
+
+        .content-guide { padding: 20px 0; border-top: 1px solid #eee; margin-top: 30px; }
+        .content-guide h3 { font-size: 18px; margin-top: 25px; color: #0066cc; }
+        .content-guide p, .content-guide li { font-size: 15px; color: #555; margin-bottom: 8px; }
+        .content-guide ul { padding-left: 20px; }
+        .highlight { background-color: #eef7ff; padding: 15px; border-radius: 5px; border-left: 4px solid #0066cc; margin-top: 20px; }
+
+        footer { text-align: center; padding: 30px 20px; background-color: #f1f1f1; font-size: 13px; color: #666; margin-top: 40px; }
+        footer a { color: #666; text-decoration: none; margin: 0 10px; }
+        footer a:hover { text-decoration: underline; color: #333; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="#">🏠 홈 (블로그)</a>
+            <a href="#">IT 정보/팁</a>
+            <a href="#">✨ 유용한 도구 모음</a>
+            <a href="#">문의하기</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>이미지 파일 이름 일괄 변환기 🔄</h1>
+
+        <div class="ad-container">[구글 애드센스 상단 광고 영역]</div>
+
+        <div class="tool-section">
+            <h3>1. 이미지 파일 또는 폴더 업로드</h3>
+            
+            <div id="dropZone" class="drop-zone">
+                📥 이곳에 이미지 파일들을 마우스로 끌어다 놓으세요.
+                <div style="font-size: 13px; font-weight: normal; margin-top: 10px; color: #999;">또는 아래 버튼을 눌러서 선택하세요.</div>
+            </div>
+
+            <div class="upload-wrapper">
+                <input type="file" id="fileInput" multiple accept="image/*">
+                <label for="fileInput" class="custom-file-btn">📄 개별 파일 선택</label>
+                
+                <input type="file" id="folderInput" webkitdirectory directory>
+                <label for="folderInput" class="custom-file-btn">📁 폴더 통째로 선택</label>
+            </div>
+            
+            <div style="text-align: center; margin-top: 15px;">
+                <div class="status" id="fileCount">현재 선택된 이미지: 0개</div>
+                <button onclick="clearFiles()" style="background-color: #777; color:white; border:none; border-radius:4px; padding: 6px 12px; font-size: 12px; cursor:pointer; margin-top: 10px;">선택 초기화</button>
+            </div>
+        </div>
+
+        <div class="tool-section">
+            <h3>2. 변환할 이름 입력 및 옵션 설정</h3>
+            <p style="font-size: 13px; color: #666; margin-top:0;">💡 <b>입력 팁:</b> 단어와 단어는 쉼표(,) 또는 줄바꿈으로 구분하세요.</p>
+            <textarea id="nameInput" placeholder="이곳에 새 파일 이름이나 단어들을 입력하세요."></textarea>
+
+            <div class="options-group">
+                <label>
+                    <input type="checkbox" id="optNumbering" checked>
+                    ✔️ <b>자동 번호 매기기</b> (이름 뒤에 _01, _02 형식으로 번호 부여)
+                </label>
+                <label>
+                    <input type="checkbox" id="optRandom" onchange="toggleRandomInput()">
+                    🎲 <b>단어 랜덤 조합</b> (입력한 단어 중 무작위로 추출하여 이름 생성)
+                </label>
+                <div style="margin-left: 25px; font-size: 14px; color: #555;">
+                    └ 조합할 단어 개수: <input type="number" id="randomCount" value="1" min="1" max="10" disabled> 개
+                </div>
+            </div>
+        </div>
+
+        <div class="ad-container" style="margin-bottom: 20px;">[구글 애드센스 하단 광고 영역]</div>
+
+        <button class="action-btn" onclick="renameAndDownload()">변환 및 압축 파일(.zip) 다운로드</button>
+
+        <div class="content-guide">
+            <h2>웹 브라우저에서 바로 쓰는 무료 파일명 변경 프로그램</h2>
+            <p>수십, 수백 장의 사진 파일 이름을 하나씩 바꾸느라 고생하고 계신가요? 이 <b>무료 이미지 이름 일괄 변환기</b>를 사용하면 별도의 프로그램 설치나 서버 업로드 과정 없이, 여러분의 웹 브라우저 내에서 안전하고 빠르게 대량의 파일명을 변경할 수 있습니다.</p>
+
+            <h3>📌 이 도구를 만든 목적과 장점</h3>
+            <ul>
+                <li><b>개인정보 보호 완벽:</b> 이미지가 서버로 전송되지 않고 사용자의 PC 내에서만 처리되므로 유출 위험이 0%입니다.</li>
+                <li><b>강력한 커스텀 옵션:</b> 단순한 순차적 이름 변경뿐만 아니라, 여러 단어를 랜덤하게 조합하는 고도의 네이밍 기능을 제공합니다.</li>
+                <li><b>작업 시간 단축:</b> 클릭 몇 번이면 수백 장의 파일이 지정된 규칙에 따라 새로운 이름으로 매핑되어 하나의 ZIP 파일로 깔끔하게 압축됩니다.</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <p>Copyright © 2024 내 블로그/사이트 이름. All rights reserved.</p>
+        <div style="margin-top: 10px;">
+            <a href="#">이용약관 (Terms of Service)</a> | 
+            <a href="#">개인정보처리방침 (Privacy Policy)</a> | 
+            <a href="#">문의하기 (Contact)</a>
+        </div>
+    </footer>
+
+    <script>
+        let selectedFiles = [];
+
+        const fileInput = document.getElementById('fileInput');
+        const folderInput = document.getElementById('folderInput');
+        const fileCountDisplay = document.getElementById('fileCount');
+        const dropZone = document.getElementById('dropZone');
+
+        // 파일 병합 및 개수 업데이트 함수
+        function processFiles(newFiles) {
+            const imageFiles = newFiles.filter(file => file.type.startsWith('image/'));
+            selectedFiles = selectedFiles.concat(imageFiles);
+            fileCountDisplay.innerText = `현재 선택된 이미지: ${selectedFiles.length}개`;
+        }
+
+        // 버튼 클릭을 통한 업로드 이벤트
+        fileInput.addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
+        folderInput.addEventListener('change', (e) => processFiles(Array.from(e.target.files)));
+
+        // ✨ 드래그 앤 드롭 이벤트 처리 ✨
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault(); // 필수: 이걸 막아줘야 드롭이 허용됨
+            dropZone.classList.add('dragover'); // 마우스 올렸을 때 시각적 효과
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover'); // 마우스 벗어나면 원래대로
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            
+            // 드롭된 파일 가져와서 병합
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                processFiles(Array.from(e.dataTransfer.files));
+            }
+        });
+
+        // 초기화
+        function clearFiles() {
+            selectedFiles = [];
+            fileInput.value = "";
+            folderInput.value = "";
+            fileCountDisplay.innerText = `현재 선택된 이미지: 0개`;
+        }
+
+        // 옵션 토글
+        function toggleRandomInput() {
+            const isRandomChecked = document.getElementById('optRandom').checked;
+            document.getElementById('randomCount').disabled = !isRandomChecked;
+        }
+
+        // 압축 및 다운로드 로직 (이전과 동일)
+        function renameAndDownload() {
+            let namesText = document.getElementById('nameInput').value;
+            const names = namesText.replace(/\n/g, ',').split(',').map(name => name.trim()).filter(name => name !== '');
+            
+            if (selectedFiles.length === 0) return alert("이미지 파일을 선택하거나 폴더를 업로드해주세요.");
+            if (names.length === 0) return alert("변경할 단어를 하나 이상 입력해주세요.");
+
+            const useNumbering = document.getElementById('optNumbering').checked;
+            const useRandom = document.getElementById('optRandom').checked;
+            const randomCount = parseInt(document.getElementById('randomCount').value, 10) || 1;
+
+            const zip = new JSZip();
+            const digitLength = String(selectedFiles.length).length;
+            const usedNamesCount = {};
+
+            const btn = document.querySelector('.action-btn');
+            btn.innerText = "압축 파일 생성 중... 잠시만 기다려주세요⏳";
+            btn.style.backgroundColor = "#ff9800";
+
+            setTimeout(() => {
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const extension = file.name.substring(file.name.lastIndexOf('.'));
+                    let baseName = "";
+                    
+                    if (useRandom) {
+                        let randomWordsArray = [];
+                        for (let j = 0; j < randomCount; j++) {
+                            const randomIndex = Math.floor(Math.random() * names.length);
+                            randomWordsArray.push(names[randomIndex]);
+                        }
+                        baseName = randomWordsArray.join('_');
+                    } else {
+                        baseName = names.length === 1 ? names[0] : (names[i] ? names[i] : `unnamed`); 
+                    }
+                    
+                    if (useNumbering) {
+                        baseName = `${baseName}_${String(i + 1).padStart(digitLength, '0')}`;
+                    } else {
+                        if (usedNamesCount[baseName]) {
+                            usedNamesCount[baseName]++;
+                            baseName = `${baseName}_${usedNamesCount[baseName]}`;
+                        } else {
+                            usedNamesCount[baseName] = 1;
+                        }
+                    }
+                    
+                    zip.file(baseName + extension, file);
+                }
+                
+                zip.generateAsync({type:"blob"}).then(function(content) {
+                    saveAs(content, "renamed_images.zip");
+                    btn.innerText = "변환 및 압축 파일(.zip) 다운로드";
+                    btn.style.backgroundColor = "#4CAF50";
+                });
+            }, 100);
+        }
+    </script>
+</body>
+</html>
