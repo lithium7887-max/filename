@@ -8,8 +8,10 @@
     <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
     
     <style>
-        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f0f2f5; text-align: center; padding: 20px; color: #333; }
-        h2 { margin-bottom: 25px; }
+        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f0f2f5; text-align: center; padding: 0; margin: 0; color: #333; }
+        
+        /* 제목에 위쪽 여백 추가 (상단 메뉴바와 겹치지 않도록) */
+        h2 { margin-top: 30px; margin-bottom: 25px; }
 
         /* [핵심 수정] UI 요소들의 너비를 통일하고 중앙 정렬하기 위한 컨테이너 */
         .ui-wrapper {
@@ -63,7 +65,7 @@
         .canvas-container-wrapper { width: 100%; max-width: 100%; overflow: auto; margin-top: 25px; display: flex; justify-content: center; padding-bottom: 20px; }
         .canvas-container { box-shadow: 0 8px 30px rgba(0,0,0,0.15); background-color: white; border-radius: 4px; }
         
-        /* [핵심 수정] 설명창 스타일 (inline-block 제거, 너비 100% 설정) */
+        /* 설명창 스타일 (inline-block 제거, 너비 100% 설정) */
         .help-text { 
             background: #e7f5ff; 
             color: #004085; 
@@ -84,6 +86,10 @@
 </head>
 <body>
 
+    <div style="text-align: center; padding: 15px 10px; background-color: #333; margin-bottom: 20px;">
+        <a href="index.html" style="color: white; text-decoration: none; margin: 0 15px; font-weight: bold;">🔄 파일 이름 일괄 변경</a>
+        <a href="editor.html" style="color: #ffcc80; text-decoration: none; margin: 0 15px; font-weight: bold;">🎨 사진 편집 & 도장 찍기</a>
+    </div>
     <h2>나만의 고화질 웹 사진 편집 툴 🎨</h2>
     
     <div class="ui-wrapper">
