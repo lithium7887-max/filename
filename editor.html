@@ -3,54 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="google" content="notranslate">
-    <title>나만의 고화질 웹 사진 편집 툴 🎨</title>
+    <title>나만의 고화질 웹 사진 편집 툴 🎨 | SIMPLEIMG</title>
+
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-0000000000000000" crossorigin="anonymous"></script>
 
     <script src="https://unpkg.com/fabric@5.3.0/dist/fabric.min.js"></script>
     
     <style>
         body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f0f2f5; text-align: center; padding: 0; margin: 0; color: #333; }
-        
-        /* 제목에 위쪽 여백 추가 (상단 메뉴바와 겹치지 않도록) */
         h2 { margin-top: 30px; margin-bottom: 25px; }
 
-        /* [핵심 수정] UI 요소들의 너비를 통일하고 중앙 정렬하기 위한 컨테이너 */
-        .ui-wrapper {
-            display: block;
-            width: 95%;           /* 모바일 등 작은 화면에서는 꽉 차게 */
-            max-width: 1050px;    /* 너무 넓어지지 않게 최대 너비 제한 (툴바 버튼들이 딱 들어갈 정도) */
-            margin: 0 auto 15px;  /* 중앙 정렬 및 아래쪽 여백 */
-        }
+        .ui-wrapper { display: block; width: 95%; max-width: 1050px; margin: 0 auto 15px; }
 
-        /* 툴바 스타일 (inline-block 제거하고 너비 100%로 설정) */
-        .toolbar { 
-            padding: 20px; 
-            background: white; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08); 
-            width: 100%; 
-            box-sizing: border-box; /* padding이 너비에 포함되도록 설정 */
-        }
-        
+        .toolbar { padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; }
         .button-group { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         .control-group { background: #f8f9fa; padding: 8px 15px; border-radius: 6px; display: inline-block; border: 1px solid #e9ecef; margin: 5px; vertical-align: middle; }
         
-        /* 버튼 및 입력창 스타일 다듬기 */
-        button, input[type="file"], select { 
-            padding: 10px 18px; 
-            margin: 4px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            border: 1px solid #ddd; 
-            border-radius: 6px; 
-            background-color: #fff; 
-            transition: all 0.2s; 
-            vertical-align: middle; 
-            font-weight: 500;
-            color: #555;
-        }
+        button, input[type="file"], select { padding: 10px 18px; margin: 4px; cursor: pointer; font-size: 14px; border: 1px solid #ddd; border-radius: 6px; background-color: #fff; transition: all 0.2s; vertical-align: middle; font-weight: 500; color: #555; }
         button:hover, select:hover { background-color: #f1f3f5; border-color: #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         
-        /* 주요 버튼 색상 포인트 */
         #btnSave { background-color: #28a745; color: white; border: none; }
         #btnSave:hover { background-color: #218838; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); }
         #btnSticker { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
@@ -61,27 +32,20 @@
         input[type="color"] { padding: 2px 4px; height: 34px; }
         input[type="range"] { vertical-align: middle; cursor: pointer; }
         
-        /* 캔버스 영역 스타일 */
         .canvas-container-wrapper { width: 100%; max-width: 100%; overflow: auto; margin-top: 25px; display: flex; justify-content: center; padding-bottom: 20px; }
         .canvas-container { box-shadow: 0 8px 30px rgba(0,0,0,0.15); background-color: white; border-radius: 4px; }
         
-        /* 설명창 스타일 (inline-block 제거, 너비 100% 설정) */
-        .help-text { 
-            background: #e7f5ff; 
-            color: #004085; 
-            padding: 15px 20px; 
-            border-radius: 10px; 
-            font-size: 14px; 
-            text-align: left; 
-            line-height: 1.7; 
-            border: 1px solid #b8daff; 
-            width: 100%;
-            box-sizing: border-box;
-            display: flex;
-            align-items: center;
-        }
+        .help-text { background: #e7f5ff; color: #004085; padding: 15px 20px; border-radius: 10px; font-size: 14px; text-align: left; line-height: 1.7; border: 1px solid #b8daff; width: 100%; box-sizing: border-box; display: flex; align-items: center; }
         .help-icon { font-size: 20px; margin-right: 15px; color: #007bff; }
         .help-content b { color: #0056b3; background-color: rgba(0,123,255,0.1); padding: 2px 4px; border-radius: 3px; }
+
+        /* [NEW] 광고 영역 스타일 (index.html과 동일, 가운데 정렬 추가) */
+        .ad-container { width: 95%; max-width: 1050px; min-height: 100px; margin: 25px auto; background-color: #fafafa; border: 1px dashed #bbb; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 10px; overflow: hidden; }
+        .ad-label { font-size: 12px; color: #aaa; letter-spacing: 1px; }
+
+        /* [NEW] 하단 푸터 스타일 (index.html과 동일) */
+        footer { text-align: center; padding: 50px 0; font-size: 14px; color: #888; border-top: 1px solid #eee; margin-top: 80px; background-color: #fff; }
+        footer a { color: #999; text-decoration: none; margin: 0 5px; }
     </style>
 </head>
 <body>
@@ -90,7 +54,12 @@
         <a href="index.html" style="color: white; text-decoration: none; margin: 0 15px; font-weight: bold;">🔄 파일 이름 일괄 변경</a>
         <a href="editor.html" style="color: #ffcc80; text-decoration: none; margin: 0 15px; font-weight: bold;">🎨 사진 편집 & 도장 찍기</a>
     </div>
+
     <h2>나만의 고화질 웹 사진 편집 툴 🎨</h2>
+
+    <div class="ad-container" id="top-ad">
+        <div class="ad-label">ADVERTISEMENT<br>(여기에 구글 광고 코드를 삽입하세요)</div>
+    </div>
     
     <div class="ui-wrapper">
         <div class="help-text">
@@ -160,15 +129,26 @@
         <canvas id="myCanvas" width="800" height="400"></canvas>
     </div>
 
+    <div class="ad-container" id="bottom-ad">
+        <div class="ad-label">ADVERTISEMENT<br>(여기에 구글 광고 코드를 삽입하세요)</div>
+    </div>
+
+    <footer>
+        <p>© 2026 SIMPLEIMG. All rights reserved.</p>
+        <p>
+            <a href="#" onclick="alert('본 서비스는 파일을 서버로 전송하지 않으며 개인정보를 수집하지 않습니다.'); return false;">개인정보처리방침</a> | 
+            <a href="#">이용약관</a>
+        </p>
+        <p style="font-size: 11px; color: #ccc; margin-top: 10px;">본 사이트는 이미지 파일을 서버에 저장하지 않는 안전한 로컬 변환 도구입니다.</p>
+    </footer>
+
     <script>
         if (typeof fabric !== 'undefined') {
             fabric.Text.prototype.textBaseline = 'bottom';
             fabric.IText.prototype.textBaseline = 'bottom';
             fabric.Object.prototype.cornerSize = 20;
             fabric.Object.prototype.transparentCorners = false;
-            // 회전 조절점(MTR)을 좀 더 위로 올려서 선택하기 쉽게 함
             fabric.Object.prototype.rotatingPointOffset = 40;
-            // 객체 선택 시 테두리 색상 변경
             fabric.Object.prototype.borderColor = '#007bff';
             fabric.Object.prototype.cornerColor = '#007bff';
         }
@@ -179,7 +159,6 @@
             const lineWidthSlider = document.getElementById('lineWidth');
             const emojiSelect = document.getElementById('emojiSelect');
 
-            // 1. 배경 사진 불러오기
             document.getElementById('imageLoader').addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -198,7 +177,6 @@
                 reader.readAsDataURL(file);
             });
 
-            // 2. 줌 & 패닝 기능
             canvas.on('mouse:wheel', function(opt) {
                 var delta = opt.e.deltaY;
                 var zoom = canvas.getZoom();
@@ -216,7 +194,7 @@
                     this.selection = false;
                     this.lastPosX = opt.e.clientX;
                     this.lastPosY = opt.e.clientY;
-                    canvas.defaultCursor = 'grabbing'; // 드래그 중 커서 변경
+                    canvas.defaultCursor = 'grabbing';
                 }
             });
 
@@ -235,11 +213,10 @@
                 if (this.isDragging) {
                     this.isDragging = false;
                     this.selection = true;
-                    canvas.defaultCursor = 'default'; // 커서 복구
+                    canvas.defaultCursor = 'default';
                 }
             });
 
-            // 3. 도형 및 텍스트 추가
             document.getElementById('btnRect').addEventListener('click', function() {
                 const rect = new fabric.Rect({ left: 100, top: 100, width: 300, height: 200, fill: 'transparent', stroke: colorPicker.value, strokeWidth: parseInt(lineWidthSlider.value), transparentCorners: false, strokeUniform: true });
                 canvas.add(rect); canvas.setActiveObject(rect);
@@ -289,7 +266,6 @@
                 }; reader.readAsDataURL(file);
             });
 
-            // 4. 실시간 속성 변경
             colorPicker.addEventListener('input', function(e) {
                 const obj = canvas.getActiveObject();
                 if (obj) {
@@ -304,7 +280,6 @@
                 if (obj && obj.fill === 'transparent') { obj.set('strokeWidth', parseInt(e.target.value, 10)); canvas.renderAll(); }
             });
 
-            // 5. 삭제 기능
             document.getElementById('btnDelete').addEventListener('click', function() {
                 const activeObject = canvas.getActiveObject();
                 if (activeObject) canvas.remove(activeObject);
@@ -320,7 +295,6 @@
                 }
             });
 
-            // 7. 고화질 저장
             document.getElementById('btnSave').addEventListener('click', function() {
                 canvas.discardActiveObject(); canvas.renderAll();
                 const currentVpt = canvas.viewportTransform.slice();
