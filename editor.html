@@ -11,51 +11,54 @@
     <style>
         body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f0f2f5; text-align: center; padding: 0; margin: 0; color: #333; }
         h2 { margin-top: 30px; margin-bottom: 25px; }
+
+        .nav-bar { text-align: center; padding: 15px 10px; background-color: #333; margin-bottom: 20px; }
+        .nav-bar a { color: white; text-decoration: none; margin: 0 15px; font-weight: bold; }
+        .nav-bar a:hover { color: #ffcc80; }
+
         .ui-wrapper { display: block; width: 95%; max-width: 1050px; margin: 0 auto 15px; }
         .toolbar { padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box; }
         .button-group { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         .control-group { background: #f8f9fa; padding: 8px 15px; border-radius: 6px; display: inline-block; border: 1px solid #e9ecef; margin: 5px; vertical-align: middle; }
+        
         button, input[type="file"], select { padding: 10px 18px; margin: 4px; cursor: pointer; font-size: 14px; border: 1px solid #ddd; border-radius: 6px; background-color: #fff; transition: all 0.2s; vertical-align: middle; font-weight: 500; color: #555; }
-        button:hover, select:hover { background-color: #f1f3f5; border-color: #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        button:hover { background-color: #f1f3f5; border-color: #ccc; }
+        
         #btnSave { background-color: #28a745; color: white; border: none; }
-        #btnSave:hover { background-color: #218838; box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2); }
+        #btnSave:hover { background-color: #218838; }
         #btnSticker { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
         #btnDelete { color: #dc3545; border-color: #dc3545; }
-        input[type="color"] { padding: 2px 4px; height: 34px; }
-        input[type="range"] { vertical-align: middle; cursor: pointer; }
-        
-        /* 캔버스 영역 복구 스타일 */
-        .canvas-container-wrapper { width: 100%; max-width: 100%; overflow: auto; margin: 25px 0; display: flex; justify-content: center; padding-bottom: 20px; min-height: 400px; }
-        .canvas-container { box-shadow: 0 8px 30px rgba(0,0,0,0.15); background-color: white; border-radius: 4px; }
-        
-        .help-text { background: #e7f5ff; color: #004085; padding: 15px 20px; border-radius: 10px; font-size: 14px; text-align: left; line-height: 1.7; border: 1px solid #b8daff; width: 100%; box-sizing: border-box; display: flex; align-items: center; }
-        .ad-container { width: 95%; max-width: 1050px; min-height: 100px; margin: 25px auto; background-color: #fafafa; border: 1px dashed #bbb; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 10px; overflow: hidden; }
-        footer { text-align: center; padding: 50px 0; font-size: 14px; color: #888; border-top: 1px solid #eee; margin-top: 80px; background-color: #fff; }
+
+        .canvas-container-wrapper { width: 95%; max-width: 1100px; min-height: 450px; margin: 30px auto; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #e9ecef; border-radius: 15px; border: 2px dashed #adb5bd; padding: 20px; box-sizing: border-box; overflow: auto; }
+        .canvas-container { display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; background-color: white; border-radius: 4px; }
+        .canvas-placeholder { color: #6c757d; text-align: center; }
+
+        /* 정보 섹션 최적화 */
+        .info-section { max-width: 900px; margin: 60px auto 40px; padding: 40px; text-align: left; color: #444; line-height: 1.8; background: white; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .info-section h3 { color: #2c3e50; border-left: 5px solid #007bff; padding-left: 15px; margin-bottom: 20px; }
+        .info-section h4 { color: #34495e; margin-top: 30px; margin-bottom: 10px; }
+        .info-section p { margin-bottom: 15px; font-size: 15px; }
+        .info-section ul { padding-left: 20px; margin-bottom: 20px; }
+        .info-section li { margin-bottom: 8px; }
+
+        .ad-container { width: 95%; max-width: 1050px; min-height: 100px; margin: 25px auto; background-color: #fafafa; border: 1px dashed #bbb; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 10px; }
+        footer { text-align: center; padding: 50px 0; font-size: 14px; color: #888; border-top: 1px solid #eee; background-color: #fff; }
         footer a { color: #999; text-decoration: none; margin: 0 5px; }
     </style>
 </head>
 <body>
 
-    <div style="text-align: center; padding: 15px 10px; background-color: #333; margin-bottom: 20px;">
-        <a href="index.html" style="color: white; text-decoration: none; margin: 0 15px; font-weight: bold;">🔄 파일 이름 일괄 변경</a>
-        <a href="editor.html" style="color: #ffcc80; text-decoration: none; margin: 0 15px; font-weight: bold;">🎨 사진 편집 & 도장 찍기</a>
+    <div class="nav-bar">
+        <a href="index.html">🔄 파일 이름 일괄 변경</a>
+        <a href="editor.html" style="color: #ffcc80;">🎨 사진 편집 & 도장 찍기</a>
     </div>
 
     <h2>나만의 고화질 웹 사진 편집 툴 🎨</h2>
 
     <div class="ad-container" id="top-ad">
-        <div class="ad-label" style="font-size:12px; color:#aaa;">ADVERTISEMENT</div>
+        <div style="font-size: 12px; color: #aaa;">ADVERTISEMENT</div>
     </div>
     
-    <div class="ui-wrapper">
-        <div class="help-text">
-            <div style="font-size: 20px; margin-right: 15px;">💡</div>
-            <div class="help-content">
-                <b>마우스 휠</b>: 이미지 확대/축소 | <b>Alt + 드래그</b>: 화면 이동 | <b>Delete</b>: 삭제
-            </div>
-        </div>
-    </div>
-
     <div class="ui-wrapper">
         <div class="toolbar">
             <div class="button-group">
@@ -68,12 +71,18 @@
                 <button id="btnDelete">🗑️ 선택 삭제</button>
                 <button id="btnSave">💾 고화질 저장</button>
             </div>
+            
             <div class="control-group">
-                🎨 <input type="color" id="colorPicker" value="#FF0000"> | 
+                🎨 색상 <input type="color" id="colorPicker" value="#FF0000"> | 
                 📏 두께 <input type="range" id="lineWidth" min="1" max="50" value="10">
             </div>
+            
             <div class="control-group" style="background: #fff9e6;">
-                😀 이모지 <select id="emojiSelect"><option value="⭐">⭐ 별</option><option value="✅">✅ 체크</option><option value="❌">❌ 엑스</option></select>
+                😀 이모지 
+                <select id="emojiSelect">
+                    <option value="⭐">⭐ 별</option><option value="✅">✅ 체크</option><option value="❌">❌ 엑스표</option>
+                    <option value="❤️">❤️ 하트</option><option value="👍">👍 따봉</option><option value="❓">❓ 물음표</option>
+                </select>
                 <button id="btnEmoji">➕ 넣기</button>
                 <button id="btnSticker">🌟 내 스티커</button>
                 <input type="file" id="stickerLoader" style="display: none;" />
@@ -81,65 +90,122 @@
         </div>
     </div>
 
-    <div class="canvas-container-wrapper">
+    <div class="canvas-container-wrapper" id="drop-area">
+        <div class="canvas-placeholder" id="placeholder-text">
+            <div style="font-size: 50px; margin-bottom: 10px;">🖼️</div>
+            <b>편집할 사진을 선택하거나 드래그하세요.</b><br>
+            <span style="font-size: 13px; opacity: 0.8;">무설치 방식으로 브라우저 내에서 안전하게 처리됩니다.</span>
+        </div>
         <canvas id="myCanvas"></canvas>
     </div>
 
     <div class="ad-container" id="bottom-ad">
-        <div class="ad-label" style="font-size:12px; color:#aaa;">ADVERTISEMENT</div>
+        <div style="font-size: 12px; color: #aaa;">ADVERTISEMENT</div>
     </div>
 
-    <div style="max-width: 900px; margin: 40px auto; padding: 20px; text-align: left; color: #444; line-height: 1.8; border-top: 1px solid #eee;">
-        <h3 style="color: #2c3e50;">무설치 고화질 사진 편집기 소개</h3>
-        <p>SIMPLEIMG의 사진 편집 툴은 설치 없이 브라우저에서 즉시 작동합니다. 원본 화질을 유지하며 보안이 철저합니다.</p>
+    <div class="info-section">
+        <h3>무설치 고화질 사진 편집기 (SIMPLEIMG Photo Editor)</h3>
+        <p>SIMPLEIMG의 온라인 사진 편집기는 복잡한 그래픽 프로그램 설치 없이 웹 브라우저 상에서 즉시 사진을 마크업하고 편집할 수 있도록 설계된 **전문가용 이미지 유틸리티**입니다. 업무용 리포트 작성, 블로그 포스팅, 쇼핑몰 상품 검수 과정에서 필요한 핵심 기능을 모두 담았습니다.</p>
+
+        <h4>✅ 왜 SIMPLEIMG 편집기를 사용해야 하나요?</h4>
+        <ul>
+            <li><strong>철저한 개인정보 보호:</strong> 업로드한 이미지는 서버로 전송되지 않습니다. 모든 편집 프로세스가 사용자의 브라우저 내(Client-Side)에서만 처리되므로 기밀 문서나 개인 사진 유출 우려가 전혀 없습니다.</li>
+            <li><strong>원본 고해상도 유지:</strong> 웹 전송을 위해 화질을 강제로 압축하지 않습니다. 고화질 원본 해상도를 그대로 유지하며 편집본을 저장할 수 있어 인쇄 및 정밀 작업에 적합합니다.</li>
+            <li><strong>직관적인 생산성 도구:</strong> 사각형, 화살표, 텍스트 도구를 통해 이미지의 핵심 정보를 즉각 강조할 수 있으며, 업무용으로 자주 사용되는 다양한 이모지를 도장처럼 찍어 활용도를 높였습니다.</li>
+        </ul>
+
+        <h4>✅ 주요 기능 가이드</h4>
+        <ul>
+            <li><strong>정밀 줌/팬 제어:</strong> 마우스 휠을 통해 세밀한 부분까지 확대 편집이 가능하며, Alt 키를 누른 상태로 드래그하여 화면을 자유롭게 이동할 수 있습니다.</li>
+            <li><strong>커스텀 스티커 기능:</strong> 제공되는 기본 이모지 외에도 사용자가 소유한 로고나 서명(PNG)을 '내 스티커'로 등록하여 워터마크처럼 삽입할 수 있습니다.</li>
+            <li><strong>실시간 스타일 변경:</strong> 도형이나 텍스트를 선택한 후 색상 피커와 선 두께 조절바를 사용하면 즉각적으로 디자인이 변경됩니다.</li>
+        </ul>
+
+        <h4>✅ 이런 분들에게 추천합니다</h4>
+        <p>현장 검수 사진에 불량 부분을 표시해야 하는 건설/제조업 종사자, 강의 자료 제작을 위해 화면 캡처본에 설명선을 넣어야 하는 교육자, 그리고 간편하게 SNS용 사진에 감성적인 텍스트를 추가하고 싶은 모든 분께 최적의 환경을 제공합니다.</p>
     </div>
 
     <footer>
         <p><b>© 2026 SIMPLEIMG. All rights reserved.</b></p>
-        <p><a href="/privacy.html">개인정보처리방침</a> | <a href="/terms.html">이용약관</a></p>
-        <p style="font-size: 13px; color: #999;">문의: admin@simpleimg.co.kr</p>
+        <p style="margin: 15px 0;">
+            <a href="privacy.html">개인정보처리방침</a> | <a href="terms.html">이용약관</a>
+        </p>
+        <p style="font-size: 13px; color: #999;">기술 문의 : <b>admin@simpleimg.co.kr</b></p>
     </footer>
 
     <script>
-        // 기존의 모든 JavaScript 로직 (Fabric.js 설정, 휠, 드래그, 저장 기능)
+        // JavaScript 로직은 이전과 동일 (기능 유지)
         if (typeof fabric !== 'undefined') {
-            fabric.Object.prototype.set({ cornerSize: 20, transparentCorners: false, borderColor: '#007bff', cornerColor: '#007bff' });
+            fabric.Object.prototype.set({ cornerSize: 12, transparentCorners: false, borderColor: '#007bff', cornerColor: '#007bff' });
         }
 
         window.onload = function() {
             const canvas = new fabric.Canvas('myCanvas');
             const colorPicker = document.getElementById('colorPicker');
             const lineWidthSlider = document.getElementById('lineWidth');
+            const emojiSelect = document.getElementById('emojiSelect');
+            const placeholder = document.getElementById('placeholder-text');
+            const dropArea = document.getElementById('drop-area');
 
             document.getElementById('imageLoader').onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
                 const reader = new FileReader();
-                reader.onload = (f) => {
-                    const img = new Image();
-                    img.src = f.target.result;
-                    img.onload = () => {
-                        canvas.setWidth(img.width); canvas.setHeight(img.height);
-                        const fImg = new fabric.Image(img);
+                reader.onload = function(f) {
+                    const imgObj = new Image();
+                    imgObj.src = f.target.result;
+                    imgObj.onload = function() {
+                        placeholder.style.display = 'none';
+                        dropArea.style.minHeight = 'auto';
+                        dropArea.style.border = 'none';
+                        dropArea.style.background = 'transparent';
+                        canvas.setWidth(this.width);
+                        canvas.setHeight(this.height);
+                        const fImg = new fabric.Image(imgObj);
                         canvas.setBackgroundImage(fImg, canvas.renderAll.bind(canvas));
+                        const container = document.querySelector('.canvas-container');
+                        if(container) container.style.display = 'block';
+                        canvas.setViewportTransform([1,0,0,1,0,0]);
                     };
                 };
-                reader.readAsDataURL(e.target.files[0]);
+                reader.readAsDataURL(file);
             };
 
-            // 도형 추가 및 기타 기능들은 유지됨...
-            document.getElementById('btnRect').onclick = () => {
-                canvas.add(new fabric.Rect({ left: 100, top: 100, width: 200, height: 150, fill: 'transparent', stroke: colorPicker.value, strokeWidth: parseInt(lineWidthSlider.value), strokeUniform: true }));
+            // 줌/팬/도형/삭제/저장 등 모든 핵심 기능 포함 (이전과 동일)
+            canvas.on('mouse:wheel', function(opt) {
+                var delta = opt.e.deltaY;
+                var zoom = canvas.getZoom();
+                zoom *= 0.999 ** delta;
+                if (zoom > 20) zoom = 20; if (zoom < 0.1) zoom = 0.1;
+                canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+                opt.e.preventDefault(); opt.e.stopPropagation();
+            });
+
+            canvas.on('mouse:down', function(opt) { if (opt.e.altKey) { this.isDragging = true; this.lastPosX = opt.e.clientX; this.lastPosY = opt.e.clientY; canvas.defaultCursor = 'grabbing'; } });
+            canvas.on('mouse:move', function(opt) { if (this.isDragging) { var vpt = this.viewportTransform; vpt[4] += opt.e.clientX - this.lastPosX; vpt[5] += opt.e.clientY - this.lastPosY; this.requestRenderAll(); this.lastPosX = opt.e.clientX; this.lastPosY = opt.e.clientY; } });
+            canvas.on('mouse:up', function() { this.isDragging = false; canvas.defaultCursor = 'default'; });
+
+            document.getElementById('btnRect').onclick = () => canvas.add(new fabric.Rect({ left: 100, top: 100, width: 200, height: 150, fill: 'transparent', stroke: colorPicker.value, strokeWidth: parseInt(lineWidthSlider.value), strokeUniform: true }));
+            document.getElementById('btnHollowCircle').onclick = () => canvas.add(new fabric.Circle({ left: 100, top: 100, radius: 80, fill: 'transparent', stroke: colorPicker.value, strokeWidth: parseInt(lineWidthSlider.value), strokeUniform: true }));
+            document.getElementById('btnCircle').onclick = () => canvas.add(new fabric.Circle({ left: 100, top: 100, radius: 80, fill: colorPicker.value }));
+            document.getElementById('btnArrow').onclick = () => canvas.add(new fabric.Path('M 0 20 L 80 20 L 80 0 L 120 30 L 80 60 L 80 40 L 0 40 Z', { left: 100, top: 100, fill: colorPicker.value }));
+            document.getElementById('btnText').onclick = () => canvas.add(new fabric.IText('입력하세요', { left: 100, top: 100, fill: colorPicker.value, fontSize: 50 }));
+            document.getElementById('btnEmoji').onclick = () => canvas.add(new fabric.Text(emojiSelect.value, { left: 100, top: 100, fontSize: 100 }));
+            document.getElementById('btnDelete').onclick = () => canvas.remove(canvas.getActiveObject());
+            window.addEventListener('keydown', (e) => { if ((e.key==='Delete'||e.key==='Backspace') && !canvas.getActiveObject()?.isEditing) canvas.remove(canvas.getActiveObject()); });
+            document.getElementById('btnSticker').onclick = () => document.getElementById('stickerLoader').click();
+            document.getElementById('stickerLoader').onchange = (e) => {
+                const reader = new FileReader();
+                reader.onload = (f) => fabric.Image.fromURL(f.target.result, (img) => { img.scale(0.2); canvas.add(img).centerObject(img).setActiveObject(img); });
+                reader.readAsDataURL(e.target.files[0]);
             };
-            
             document.getElementById('btnSave').onclick = () => {
-                canvas.discardActiveObject(); canvas.renderAll();
+                canvas.discardActiveObject().renderAll();
                 const link = document.createElement('a');
-                link.download = 'edited.png';
-                link.href = canvas.toDataURL({ format: 'png', quality: 1 });
+                link.download = 'SIMPLEIMG_EDIT.png';
+                link.href = canvas.toDataURL({ format: 'png', quality: 1, enableRetinaScaling: true });
                 link.click();
             };
-            
-            // 삭제 기능
-            document.getElementById('btnDelete').onclick = () => { canvas.remove(canvas.getActiveObject()); };
         };
     </script>
 </body>
