@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>홍반장 누끼 마스터 Pro - AI Background Remover</title>
+    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.3/dist/index.umd.js"></script>
+    <style>
+        :root {
+            --primary: #8e44ad;
+            --primary-dark: #703688;
+            --secondary: #2980b9;
+            --accent: #f39c12;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --bg-dark: #121212;
+            --toolbar-bg: #1e1e1e;
+            --panel-bg: #252525;
+            --text: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            background: var(--toolbar-bg);
+            padding: 12px 20px;
+            display: flex;
+            flex-direction: column;
+            /* 세로로 행(row)을 쌓음 */
+            gap: 12px;
+            border-bottom: 1px solid #333;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .toolbar-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            /* 창 크기에 따라 줄바꿈 허용 */
+        }
+
+        .tool-group {
+            display: flex;
+            gap: 6px;
+            padding-right: 12px;
+            border-right: 1px solid #444;
+        }
+
+        .tool-group:last-child {
+            border-right: none;
+            padding-right: 0;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            background: #444;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.active {
+            outline: 2px solid white;
+            outline-offset: -2px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, var(--primary), #9b59b6);
+        }
+
+        .btn-tool {
+            background: var(--secondary);
+        }
+
+        .btn-run {
+            background: var(--accent);
+            color: #000;
+            font-weight: 800;
+        }
+
+        .btn-erase {
+            background: #e74c3c;
+            font-weight: 800;
+        }
+
+        .btn-save {
+            background: var(--success);
+        }
+
+        .btn-reset {
+            background: var(--danger);
+        }
+
+        .btn-upload {
+            background: #333;
+            border: 1px solid #555;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            background-image:
+                linear-gradient(45deg, #222 25%, transparent 25%),
+                linear-gradient(-45deg, #222 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #222 75%),
+                linear-gradient(-45deg, transparent 75%, #222 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #canvas-viewport {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            cursor: grab;
+        }
+
+        #canvas-viewport.panning {
+            cursor: grabbing !important;
+        }
+
+        #canvas-viewport.drawing {
+            cursor: crosshair;
+        }
+
+        #canvas-viewport.eraser {
+            cursor: none;
+        }
+
+        /* 지우개 모드일 때는 커스텀 커서(프리뷰) 사용 */
+
+        #container {
+            position: absolute;
+            transform-origin: 0 0;
+            will-change: transform;
+        }
+
+        canvas {
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+            background: white;
+            display: block;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            image-rendering: pixelated;
+        }
+
+        /* Status & UI Overlays */
+        #status-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(20, 20, 20, 0.95);
+            padding: 12px 24px;
+            border-radius: 30px;
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #status-bar.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .loader {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .controls-panel {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: var(--panel-bg);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        input[type="range"] {
+            width: 150px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="toolbar">
+        <!-- 첫 번째 줄: 파일, AI 자동 배경 제거 -->
+        <div class="toolbar-row">
+            <div class="tool-group">
+                <input type="file" id="upload" accept="image/*" style="display:none;">
+                <button class="btn-upload" onclick="document.getElementById('upload').click()">📁 사진 열기</button>
+            </div>
+            <div class="tool-group">
+                <button class="btn-ai" id="btn-auto">🤖 AI 자동 배경제거</button>
+            </div>
+        </div>
+
+        <!-- 두 번째 줄: 선택 툴 모음 -->
+        <div class="toolbar-row">
+            <div class="tool-group">
+                <button class="btn-tool" id="btn-magic" title="마법봉 (클릭한 지점과 비슷한 색상 제거)">🪄 마법봉</button>
+                <button class="btn-tool" id="btn-lasso" title="올가미 (자유 곡선 영역 선택)">✂️ 올가미</button>
+                <button class="btn-tool" id="btn-rect" title="사각형 (사각형 영역 선택)">🔲 사각형</button>
+                <button class="btn-tool" id="btn-circle" title="원형 (원형 영역 선택)">⭕ 원형</button>
+                <button class="btn-tool" id="btn-magnetic" title="자석 (자동 테두리 추적)">🧲 자석</button>
+                <button class="btn-tool" id="btn-eraser" title="지우개 (드래그하여 원형으로 지우기)">🧽 지우개</button>
+            </div>
+        </div>
+
+        <!-- 세 번째 줄: 추출 도구, 다듬기, 되돌리기, 저장 등 -->
+        <div class="toolbar-row">
+            <div class="tool-group">
+                <button class="btn-run" id="btn-apply" title="선택한 영역만 남기고 바깥 지우기">⚡ 선택 남기기</button>
+                <button class="btn-erase" id="btn-erase-sel" title="선택한 영역 안쪽만 지우기">❌ 선택 지우기</button>
+            </div>
+            <div class="tool-group">
+                <button class="btn-tool" id="btn-smooth" style="background:#16a085;"
+                    title="투명한 경계를 부드럽게(안티앨리어싱) 처리합니다.">💧 경계선 다듬기</button>
+            </div>
+            <div class="tool-group">
+                <button class="btn-tool" id="btn-undo" title="이전 작업으로 되돌리기 (Ctrl+Z)" style="background:#34495e;">↩️
+                    되돌리기</button>
+                <button class="btn-reset" id="btn-reset">🔄 초기화</button>
+                <button class="btn-save" id="btn-download">💾 투명 PNG 저장</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-panel">
+        <div class="control-item">
+            <label>마법봉 민감도: <span id="tol-val">30</span></label>
+            <input type="range" id="tolerance" min="0" max="100" value="30">
+        </div>
+        <div class="control-item">
+            <label>지우개 크기: <span id="eraser-val">20</span></label>
+            <input type="range" id="eraser-size" min="1" max="150" value="20">
+        </div>
+    </div>
+
+    <div id="status-bar">
+        <div class="loader" id="loader"></div>
+        <span id="status-msg">메시지</span>
+    </div>
+
+    <div class="main-container">
+        <!-- 캔버스 이동(팬) 방법 설명 추가 -->
+        <div
+            style="position:absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 8px; font-size: 13px; color: #ccc; z-index: 50; pointer-events: none; border: 1px solid #444;">
+            💡 <b>화면 이동:</b> 마우스 휠 클릭 후 드래그 또는 Alt + 클릭 드래그
+        </div>
+        <div id="canvas-viewport">
+            <div id="container">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const viewport = document.getElementById('canvas-viewport');
+        const container = document.getElementById('container');
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        const statusBar = document.getElementById('status-bar');
+        const statusMsg = document.getElementById('status-msg');
+        const loader = document.getElementById('loader');
+        const toleranceInput = document.getElementById('tolerance');
+        const tolVal = document.getElementById('tol-val');
+        const eraserSizeInput = document.getElementById('eraser-size');
+        const eraserVal = document.getElementById('eraser-val');
+
+        let originalImg = null;
+        let currentImg = null;
+        let scale = 1, offsetX = 0, offsetY = 0;
+        let mode = 'none', isDrawing = false, isPanning = false, isErasing = false;
+        let points = [], startX, startY;
+        let brushX = 0, brushY = 0; // 지우개 프리뷰용
+
+        let undoStack = [];
+        const MAX_UNDO = 20;
+
+        // 초기 설정
+        toleranceInput.oninput = () => { tolVal.innerText = toleranceInput.value; };
+        eraserSizeInput.oninput = () => {
+            eraserVal.innerText = eraserSizeInput.value;
+            if (mode === 'eraser') render();
+        };
+
+        function msg(text, isLoading = false) {
+            statusMsg.innerText = text;
+            loader.style.display = isLoading ? 'block' : 'none';
+            statusBar.classList.add('visible');
+            if (!isLoading) {
+                setTimeout(() => statusBar.classList.remove('visible'), 4000);
+            }
+        }
+
+        // 빈 캔버스를 화면 중앙에 배치하는 초기화 함수
+        function initEmptyCanvas() {
+            canvas.width = 800;
+            canvas.height = 500;
+
+            const vw = viewport.clientWidth;
+            const vh = viewport.clientHeight;
+
+            // 창 크기에 비례하여 초기 스케일 및 중앙 좌표 계산
+            const s = Math.min((vw * 0.8) / canvas.width, (vh * 0.8) / canvas.height);
+            scale = s;
+            offsetX = (vw - canvas.width * scale) / 2;
+            offsetY = (vh - canvas.height * scale) / 2;
+
+            updateView();
+        }
+
+        window.addEventListener('load', initEmptyCanvas);
+
+        // 1. 사진 불러오기
+        document.getElementById('upload').onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    originalImg = img;
+                    currentImg = img;
+                    setupCanvas();
+                    msg("✅ 로드 완료! 도구를 선택하고 배경을 제거하세요.");
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        function setupCanvas() {
+            if (!originalImg) return;
+            canvas.width = originalImg.width;
+            canvas.height = originalImg.height;
+
+            const vw = viewport.clientWidth;
+            const vh = viewport.clientHeight;
+            const s = Math.min((vw * 0.8) / canvas.width, (vh * 0.8) / canvas.height);
+            scale = s;
+            offsetX = (vw - canvas.width * scale) / 2;
+            offsetY = (vh - canvas.height * scale) / 2;
+
+            updateView();
+            render();
+        }
+
+        function render() {
+            if (!currentImg) return;
+
+            // 지우개 모드 중(isErasing == true)에는 ctx.clearRect를 생략하고 위에 그려진 상태를 유지
+            if (!isErasing) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.drawImage(currentImg, 0, 0);
+            }
+
+            // 다각형/경로 선택 영역 프리뷰 (올가미, 자석, 또는 마우스에서 손 뗀 후의 사각형/원형)
+            if (points.length > 0) {
+                // 사각형/원형 그리는 중일 때
+                if ((mode === 'rect' || mode === 'circle') && isDrawing && points.length === 2) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#f1c40f';
+                    ctx.setLineDash([5 / scale, 5 / scale]);
+                    ctx.lineWidth = 2 / scale;
+
+                    const p1 = points[0];
+                    const p2 = points[1];
+
+                    if (mode === 'rect') {
+                        ctx.rect(p1.x, p1.y, p2.x - p1.x, p2.y - p1.y);
+                    } else if (mode === 'circle') {
+                        const cx = (p1.x + p2.x) / 2;
+                        const cy = (p1.y + p2.y) / 2;
+                        const radiusX = Math.abs(p2.x - p1.x) / 2;
+                        const radiusY = Math.abs(p2.y - p1.y) / 2;
+                        ctx.ellipse(cx, cy, radiusX, radiusY, 0, 0, 2 * Math.PI);
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                } else {
+                    // 다각형으로 변환된 후(mouseup 이후) 또는 올가미/자석 진행 중
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#f1c40f';
+                    ctx.setLineDash([5 / scale, 5 / scale]);
+                    ctx.lineWidth = 2 / scale;
+                    ctx.moveTo(points[0].x, points[0].y);
+                    points.forEach(p => ctx.lineTo(p.x, p.y));
+                    if (!isDrawing) ctx.closePath();
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+
+            // 지우개 브러시 렌더링 (그리는 중이 아닐 때만 프리뷰 표시, 그리는 중이라면 이미지만 업데이트)
+            if (mode === 'eraser' && !isPanning && !isErasing) {
+                const r = parseFloat(eraserSizeInput.value) / scale;
+                ctx.beginPath();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2 / scale;
+                ctx.arc(brushX, brushY, r, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.strokeStyle = 'black';
+                ctx.lineWidth = 1 / scale;
+                ctx.arc(brushX, brushY, r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        function updateView() {
+            container.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+        }
+
+        // 2. 도구 선택
+        const buttons = document.querySelectorAll('.btn-tool');
+        function setMode(newMode, btn) {
+            mode = newMode;
+            buttons.forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            points = [];
+            isErasing = false;
+            render();
+
+            viewport.classList.remove('drawing', 'eraser');
+            if (mode === 'magic') viewport.style.cursor = 'crosshair';
+            else if (mode === 'lasso' || mode === 'magnetic') viewport.classList.add('drawing'), viewport.style.cursor = '';
+            else if (mode === 'eraser') viewport.classList.add('eraser'), viewport.style.cursor = '';
+            else viewport.style.cursor = 'grab';
+        }
+
+        document.getElementById('btn-magic').onclick = function () { setMode('magic', this); msg("🪄 마법봉: 제거할 배경 영역을 클릭하세요."); };
+        document.getElementById('btn-lasso').onclick = function () { setMode('lasso', this); msg("✂️ 올가미: 추출할 물체 주변을 그려 영역을 선택하세요."); };
+        document.getElementById('btn-rect').onclick = function () { setMode('rect', this); msg("🔲 사각형: 드래그하여 사각형 영역을 선택하세요."); };
+        document.getElementById('btn-circle').onclick = function () { setMode('circle', this); msg("⭕ 원형: 드래그하여 타원형 영역을 선택하세요."); };
+        document.getElementById('btn-magnetic').onclick = function () { setMode('magnetic', this); msg("🧲 자석: 경계를 따라 영역을 선택하세요."); };
+        document.getElementById('btn-eraser').onclick = function () { setMode('eraser', this); msg("🧽 지우개: 드래그하여 배경을 원형으로 지우세요."); };
+
+        document.getElementById('btn-undo').onclick = performUndo;
+
+        document.getElementById('btn-reset').onclick = () => {
+            saveState(); // 초기화 전 상태 저장
+            currentImg = originalImg;
+            setMode('none');
+            render();
+            msg("🔄 초기화 되었습니다.");
+        };
+
+        // 3. 마우스/터치 인터랙션
+        viewport.onmousedown = (e) => {
+            if (!currentImg) return;
+
+            if (e.button === 1 || e.altKey || mode === 'none') {
+                isPanning = true;
+                startX = e.clientX - offsetX;
+                startY = e.clientY - offsetY;
+                viewport.classList.add('panning');
+                return;
+            }
+
+            const rect = canvas.getBoundingClientRect();
+            const rx = (e.clientX - rect.left) / scale;
+            const ry = (e.clientY - rect.top) / scale;
+
+            if (mode === 'magic') {
+                saveState();
+                floodFill(rx, ry);
+            } else if (mode === 'lasso' || mode === 'magnetic') {
+                isDrawing = true;
+                points = [{ x: rx, y: ry }];
+            } else if (mode === 'rect' || mode === 'circle') {
+                isDrawing = true;
+                points = [{ x: rx, y: ry }, { x: rx, y: ry }]; // 시작점과 끝점 초기화
+            } else if (mode === 'eraser') {
+                saveState();
+                // 지우개 프리뷰(원 테두리)가 남는 것을 방지하기 위해 그리기 직전에 캔버스를 깨끗하게 초기화합니다.
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.drawImage(currentImg, 0, 0);
+
+                isErasing = true;
+                eraseCircle(rx, ry);
+            }
+        };
+
+        window.onmousemove = (e) => {
+            if (isPanning) {
+                offsetX = e.clientX - startX;
+                offsetY = e.clientY - startY;
+                updateView();
+                return;
+            }
+
+            const rect = canvas.getBoundingClientRect();
+            let rx = (e.clientX - rect.left) / scale;
+            let ry = (e.clientY - rect.top) / scale;
+
+            if (mode === 'eraser') {
+                brushX = rx; brushY = ry;
+                if (isErasing) {
+                    eraseCircle(rx, ry);
+                } else {
+                    render(); // 프리뷰 업데이트를 위해
+                }
+            } else if (isDrawing && (mode === 'lasso' || mode === 'magnetic')) {
+                points.push({ x: rx, y: ry });
+                render();
+            } else if (isDrawing && (mode === 'rect' || mode === 'circle')) {
+                points[1] = { x: rx, y: ry }; // 끝점 업데이트
+                render();
+            }
+        };
+
+        window.onmouseup = () => {
+            isPanning = false;
+            viewport.classList.remove('panning');
+
+            if (isErasing) {
+                isErasing = false;
+                updateStateFromCanvas(canvas, null, false); // 상태 지연없이 업데이트(saveState는 mousedown에서 이미 함)
+            } else if (isDrawing) {
+                isDrawing = false;
+                if (mode === 'rect' || mode === 'circle') {
+                    // 사각형/원형은 마우스 뗐을 때 윤곽선을 패스로 확정짓기 위해 points를 변환해줌 (선택 추출시 동일한 로직을 쓰기 위해)
+                    convertShapeToPath();
+                }
+                render(); // 윤곽선 닫기
+            }
+        };
+
+        // 사각형/원형 영역을 일반 다각형 포인트 배열로 변환
+        function convertShapeToPath() {
+            if (points.length !== 2) return;
+            const p1 = points[0];
+            const p2 = points[1];
+
+            const newPoints = [];
+            if (mode === 'rect') {
+                newPoints.push({ x: p1.x, y: p1.y });
+                newPoints.push({ x: p2.x, y: p1.y });
+                newPoints.push({ x: p2.x, y: p2.y });
+                newPoints.push({ x: p1.x, y: p2.y });
+                points = newPoints;
+            } else if (mode === 'circle') {
+                const cx = (p1.x + p2.x) / 2;
+                const cy = (p1.y + p2.y) / 2;
+                const rx = Math.abs(p2.x - p1.x) / 2;
+                const ry = Math.abs(p2.y - p1.y) / 2;
+
+                // 타원을 36개의 점으로 근사
+                for (let i = 0; i < 36; i++) {
+                    const angle = (i * 10) * (Math.PI / 180);
+                    newPoints.push({
+                        x: cx + rx * Math.cos(angle),
+                        y: cy + ry * Math.sin(angle)
+                    });
+                }
+                points = newPoints;
+            }
+        }
+
+        // 실행 취소 (Undo) 기능
+        function saveState() {
+            if (!currentImg) return;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            tempCanvas.getContext('2d').drawImage(currentImg, 0, 0);
+
+            undoStack.push(tempCanvas.toDataURL());
+            if (undoStack.length > MAX_UNDO) undoStack.shift();
+        }
+
+        function performUndo() {
+            if (undoStack.length === 0) {
+                msg("❌ 이전 작업이 없습니다.");
+                return;
+            }
+            const previousData = undoStack.pop();
+            const img = new Image();
+            img.onload = () => {
+                currentImg = img;
+                points = []; // 영역도 초기화
+                render();
+                msg("↩️ 되돌리기 완료");
+            };
+            img.src = previousData;
+        }
+
+        // 단축키 (Ctrl+Z)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'z') {
+                e.preventDefault();
+                performUndo();
+            }
+        });
+
+        // 지우개 로직
+        function eraseCircle(x, y) {
+            // 이미 렌더링된 캔버스에 직접 구멍 뚫기
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            const r = parseFloat(eraserSizeInput.value) / scale;
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        // 줌 기능
+        viewport.onwheel = (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const prevScale = scale;
+            scale = Math.max(0.05, Math.min(scale * delta, 20));
+
+            const rect = viewport.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            offsetX = mouseX - (mouseX - offsetX) * (scale / prevScale);
+            offsetY = mouseY - (mouseY - offsetY) * (scale / prevScale);
+
+            updateView();
+            render(); // 스케일 바뀔 때 선 두께나 브러시 프리뷰 업데이트
+        };
+
+        // 4. 알고리즘 구현
+
+        // 4-1. [⚡ 선택 추출] - 올가미/도형 영역 밖 제거
+        document.getElementById('btn-apply').onclick = () => {
+            if (points.length < 3) { msg("❌ 영역을 먼저 지정해주세요!"); return; }
+
+            saveState();
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tctx = tempCanvas.getContext('2d');
+
+            tctx.beginPath();
+            tctx.moveTo(points[0].x, points[0].y);
+            points.forEach(p => tctx.lineTo(p.x, p.y));
+            tctx.closePath();
+            tctx.fill();
+
+            tctx.globalCompositeOperation = 'source-in';
+            tctx.drawImage(currentImg, 0, 0);
+
+            updateStateFromCanvas(tempCanvas, null, false);
+            points = [];
+            msg("✅ 선택 영역만 추출되었습니다.");
+        };
+
+        // 4-2. [❌ 선택 지우기] - 올가미/도형 영역 내부 제거
+        document.getElementById('btn-erase-sel').onclick = () => {
+            if (points.length < 3) { msg("❌ 지울 영역을 먼저 지정해주세요!"); return; }
+
+            saveState();
+
+            // 현재 이미지를 캔버스에 초기화
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(currentImg, 0, 0);
+
+            // 내부 영역 지우기
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            points.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalCompositeOperation = 'source-over';
+
+            updateStateFromCanvas(canvas, null, false);
+            points = [];
+            msg("✅ 선택 영역이 삭제되었습니다.");
+        };
+
+        // 4-3. 마법봉 (Flood Fill 기반 배경 제거)
+        function floodFill(startX, startY) {
+            const x = Math.floor(startX);
+            const y = Math.floor(startY);
+
+            // 투명 배경이 포함된 전체 렌더링
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImg, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            const width = imageData.width;
+            const height = imageData.height;
+
+            const startPos = (y * width + x) * 4;
+            const startR = pixels[startPos];
+            const startG = pixels[startPos + 1];
+            const startB = pixels[startPos + 2];
+            const startA = pixels[startPos + 3];
+
+            if (startA === 0) return;
+
+            const tolerance = parseInt(toleranceInput.value);
+            const stack = [[x, y]];
+            const visited = new Uint8Array(width * height);
+
+            while (stack.length > 0) {
+                const [curX, curY] = stack.pop();
+                const pos = (curY * width + curX) * 4;
+
+                if (curX < 0 || curX >= width || curY < 0 || curY >= height) continue;
+                if (visited[curY * width + curX]) continue;
+
+                const r = pixels[pos];
+                const g = pixels[pos + 1];
+                const b = pixels[pos + 2];
+
+                const diff = Math.sqrt((r - startR) ** 2 + (g - startG) ** 2 + (b - startB) ** 2);
+
+                if (diff <= tolerance) {
+                    pixels[pos + 3] = 0; // 투명하게
+                    visited[curY * width + curX] = 1;
+
+                    stack.push([curX + 1, curY]);
+                    stack.push([curX - 1, curY]);
+                    stack.push([curX, curY + 1]);
+                    stack.push([curX, curY - 1]);
+                }
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+            updateStateFromCanvas(canvas);
+            msg("✅ 배경 색상 제거 완료!");
+        }
+
+        // 4-3.5. [💧 경계선 다듬기] - 알파 채널 블러 처리 방식을 통한 안티앨리어싱
+        document.getElementById('btn-smooth').onclick = () => {
+            if (!currentImg) return;
+
+            saveState();
+            msg("💧 경계선을 다듬는 중입니다...", true);
+
+            // 약간의 지연을 주어 UI 업데이트를 원활하게 함
+            setTimeout(() => {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tctx = tempCanvas.getContext('2d');
+
+                // 1. 원본 이미지를 불투명한 임시 배경 캔버스에 그리기 (가장자리 번짐 방지)
+                const solidCanvas = document.createElement('canvas');
+                solidCanvas.width = canvas.width;
+                solidCanvas.height = canvas.height;
+                const sctx = solidCanvas.getContext('2d');
+                // 색상이 섞이지 않도록 일단 그대로 그림
+                sctx.drawImage(currentImg, 0, 0);
+
+                // 2. 블러 처리된 마스크 생성 (알파 채널 이용)
+                const maskCanvas = document.createElement('canvas');
+                maskCanvas.width = canvas.width;
+                maskCanvas.height = canvas.height;
+                const mctx = maskCanvas.getContext('2d');
+
+                mctx.drawImage(currentImg, 0, 0);
+
+                // 외곽선을 흐리게
+                mctx.filter = 'blur(1.5px)';
+                mctx.globalCompositeOperation = 'copy'; // 덮어쓰기
+                mctx.drawImage(maskCanvas, 0, 0);
+                mctx.filter = 'none';
+                mctx.globalCompositeOperation = 'source-over';
+
+                // 3. 최종 조합 기능
+                tctx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+                // 마스크 먼저 그리고, source-in으로 원본 색상을 가져옴
+                tctx.drawImage(maskCanvas, 0, 0);
+                tctx.globalCompositeOperation = 'source-in';
+                tctx.drawImage(solidCanvas, 0, 0);
+
+                updateStateFromCanvas(tempCanvas);
+                msg("✅ 경계선이 부드러워졌습니다!");
+            }, 50);
+        };
+
+
+        // 4-4. AI 자동 제거
+        document.getElementById('btn-auto').onclick = async () => {
+            if (!currentImg) return;
+            try {
+                saveState();
+                msg("🤖 AI가 배경을 분석 중입니다...", true);
+                const blob = await imglyRemoveBackground(currentImg);
+                const url = URL.createObjectURL(blob);
+                const resImg = new Image();
+                resImg.onload = () => {
+                    updateStateFromCanvas(null, resImg);
+                    msg("✅ AI 자동 제거 완료!");
+                    URL.revokeObjectURL(url);
+                };
+                resImg.src = url;
+            } catch (error) {
+                console.error(error);
+                msg("❌ AI 처리 중 오류가 발생했습니다.");
+            }
+        };
+
+        function updateStateFromCanvas(sourceCanvas, sourceImg = null, shouldSaveState = true) {
+            if (shouldSaveState) saveState();
+
+            if (sourceImg) {
+                currentImg = sourceImg;
+            } else {
+                const newImg = new Image();
+                newImg.src = sourceCanvas.toDataURL();
+                currentImg = newImg;
+            }
+            points = []; // 상태 업데이트 될 때 선택영역도 초기화
+            setTimeout(render, 50);
+        }
+
+        // 5. 저장
+        document.getElementById('btn-download').onclick = () => {
+            if (!currentImg) return;
+            msg("💾 저장 중...");
+
+            // 현재 이미지를 새 캔버스에 그려서 저장 (투명 배경 확실히 보장)
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = canvas.width;
+            exportCanvas.height = canvas.height;
+            const ectx = exportCanvas.getContext('2d');
+            ectx.drawImage(currentImg, 0, 0);
+
+            const link = document.createElement('a');
+            link.download = 'nukki_pro_' + Date.now() + '.png';
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+        };
+
+        window.onresize = () => {
+            if (currentImg) {
+                const vw = viewport.clientWidth;
+                const vh = viewport.clientHeight;
+                const s = Math.min((vw * 0.8) / canvas.width, (vh * 0.8) / canvas.height);
+                scale = s;
+                offsetX = (vw - canvas.width * scale) / 2;
+                offsetY = (vh - canvas.height * scale) / 2;
+                updateView();
+                render();
+            }
+        };
+
+    </script>
+</body>
+
+</html>
