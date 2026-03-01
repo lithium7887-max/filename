@@ -253,8 +253,13 @@
 
 <body>
 
+    <div style="text-align: center; padding: 12px 10px; background-color: #1e1e1e; border-bottom: 1px solid #333; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.2); z-index: 101;">
+        <a href="index.html" style="color: white; text-decoration: none; margin: 0 15px; font-weight: bold; font-size: 14px;">🔄 파일 이름 일괄 변경</a>
+        <a href="editor.html" style="color: white; text-decoration: none; margin: 0 15px; font-weight: bold; font-size: 14px;">🎨 사진 편집 & 도장 찍기</a>
+        <a href="nuki.html" style="color: #80deea; text-decoration: none; margin: 0 15px; font-weight: bold; font-size: 14px;">✂️ 배경 지우기(누끼)</a>
+    </div>
+
     <div class="toolbar">
-        <!-- 첫 번째 줄: 파일, AI 자동 배경 제거 -->
         <div class="toolbar-row">
             <div class="tool-group">
                 <input type="file" id="upload" accept="image/*" style="display:none;">
@@ -265,7 +270,6 @@
             </div>
         </div>
 
-        <!-- 두 번째 줄: 선택 툴 모음 -->
         <div class="toolbar-row">
             <div class="tool-group">
                 <button class="btn-tool" id="btn-magic" title="마법봉 (클릭한 지점과 비슷한 색상 제거)">🪄 마법봉</button>
@@ -277,7 +281,6 @@
             </div>
         </div>
 
-        <!-- 세 번째 줄: 추출 도구, 다듬기, 되돌리기, 저장 등 -->
         <div class="toolbar-row">
             <div class="tool-group">
                 <button class="btn-run" id="btn-apply" title="선택한 영역만 남기고 바깥 지우기">⚡ 선택 남기기</button>
@@ -313,7 +316,6 @@
     </div>
 
     <div class="main-container">
-        <!-- 캔버스 이동(팬) 방법 설명 추가 -->
         <div
             style="position:absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.6); padding: 8px 12px; border-radius: 8px; font-size: 13px; color: #ccc; z-index: 50; pointer-events: none; border: 1px solid #444;">
             💡 <b>화면 이동:</b> 마우스 휠 클릭 후 드래그 또는 Alt + 클릭 드래그
