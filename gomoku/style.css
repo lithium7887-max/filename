@@ -34,11 +34,14 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* 기존 가로 정렬에서 세로(위에서 아래) 정렬로 변경 */
+    justify-content: flex-start; /* 화면 중앙이 아닌 위쪽부터 차례대로 배치 */
     align-items: center;
     min-height: 100vh;
+    padding: 40px 20px; /* 위아래 여백 추가 */
 }
 
+/* --- 오목 게임판 메인 영역 --- */
 .container {
     width: 100%;
     max-width: 600px;
@@ -201,4 +204,64 @@ button:hover {
     to {
         transform: scale(1);
     }
+}
+
+/* --- SEO 설명글 및 푸터 영역 (새로 추가 및 병합된 부분) --- */
+.seo-content {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 40px;
+    background: var(--panel-bg); /* 다크모드 호환 */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    line-height: 1.6;
+    box-sizing: border-box;
+}
+
+.seo-content h2 {
+    font-size: 1.4rem;
+    border-bottom: 2px solid var(--cell-border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.seo-content h3 {
+    font-size: 1.2rem;
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+.seo-content ul {
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+
+.seo-content li {
+    margin-bottom: 8px;
+}
+
+footer {
+    width: 100%;
+    max-width: 600px;
+    margin-top: 40px;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+footer .footer-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+footer .footer-links a:hover {
+    text-decoration: underline;
+}
+
+footer p {
+    margin-top: 10px;
 }
