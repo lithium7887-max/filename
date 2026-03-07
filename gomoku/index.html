@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오목</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>오목</h1>
+            <div class="theme-toggle">
+                <button id="themeBtn">🌓</button>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="difficulty-selector">
+                <label for="difficulty">AI Level: </label>
+                <select id="difficulty">
+                    <option value="1">레벨 1 (초보)</option>
+                    <option value="2">레벨 2</option>
+                    <option value="3">레벨 3</option>
+                    <option value="4">레벨 4</option>
+                    <option value="5" selected>레벨 5 (보통)</option>
+                    <option value="6">레벨 6</option>
+                    <option value="7">레벨 7</option>
+                    <option value="8">레벨 8</option>
+                    <option value="9">레벨 9</option>
+                    <option value="10">레벨 10 (전문가)</option>
+                </select>
+            </div>
+            <button id="newGameBtn">새 게임</button>
+        </div>
+
+        <div class="status-container">
+            <p id="statusMsg">당신의 차례입니다! (흑돌)</p>
+        </div>
+
+        <div class="board-container">
+            <div id="board" class="board"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
